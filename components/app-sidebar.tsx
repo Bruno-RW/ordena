@@ -83,14 +83,12 @@ export function AppSidebar() {
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton
-                      asChild
+                      render={<Link href={item.href} />}
                       isActive={isActive}
                       tooltip={item.label}
                     >
-                      <Link href={item.href}>
-                        <item.icon />
-                        <span>{item.label}</span>
-                      </Link>
+                      <item.icon />
+                      <span>{item.label}</span>
                     </SidebarMenuButton>
                     {item.href === "/tarefas" && pendentes > 0 && (
                       <SidebarMenuBadge>{pendentes}</SidebarMenuBadge>
@@ -106,8 +104,7 @@ export function AppSidebar() {
       <SidebarFooter className="border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip={perfil.nome} size="lg">
-              <Link href="/perfil">
+            <SidebarMenuButton render={<Link href="/perfil" />} tooltip={perfil.nome} size="lg">
                 <Avatar className="size-8 rounded-lg">
                   <AvatarFallback className="rounded-lg bg-primary/10 text-primary text-xs font-semibold">
                     {perfil.avatarInitials}
@@ -121,7 +118,6 @@ export function AppSidebar() {
                     {perfil.semestre}º semestre
                   </span>
                 </div>
-              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

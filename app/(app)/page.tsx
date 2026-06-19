@@ -11,7 +11,7 @@ import {
   IconSchool,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -42,12 +42,12 @@ function statusVariant(
   return "outline";
 }
 
-function daysUntil(dateStr: string) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+function daysUntil(dateStr: string, today: Date) {
+  const t = new Date(today);
+  t.setHours(0, 0, 0, 0);
   const d = new Date(dateStr);
   d.setHours(0, 0, 0, 0);
-  return Math.round((d.getTime() - today.getTime()) / 86400000);
+  return Math.round((d.getTime() - t.getTime()) / 86400000);
 }
 
 function formatDate(dateStr: string) {
@@ -59,6 +59,11 @@ function formatDate(dateStr: string) {
 
 export default function DashboardPage() {
   const { disciplinas, tarefas, notas, perfil } = useStore();
+  const [today, setToday] = useState<Date | null>(null);
+
+  useEffect(() => {
+    setToday(new Date());
+  }, []);
 
   const stats = useMemo(() => {
     const total = tarefas.length;
@@ -260,8 +265,8 @@ export default function DashboardPage() {
                   const disc = disciplinaMap[tarefa.disciplinaId] as
                     | Disciplina
                     | undefined;
-                  const days = daysUntil(tarefa.prazo);
-                  const isUrgent = days <= 2;
+                  const days = today ? daysUntil(tarefa.prazo, today) : null;
+                  const isUrgent = days !== null && days <= 2;
 
                   return (
                     <div
@@ -300,13 +305,15 @@ export default function DashboardPage() {
                           <IconClock className="size-3.5" />
                         )}
                         <span>
-                          {days === 0
-                            ? "Hoje"
-                            : days === 1
-                              ? "Amanhã"
-                              : days < 0
-                                ? "Atrasada"
-                                : formatDate(tarefa.prazo)}
+                          {days === null
+                            ? formatDate(tarefa.prazo)
+                            : days === 0
+                              ? "Hoje"
+                              : days === 1
+                                ? "Amanhã"
+                                : days < 0
+                                  ? "Atrasada"
+                                  : formatDate(tarefa.prazo)}
                         </span>
                       </div>
                     </div>

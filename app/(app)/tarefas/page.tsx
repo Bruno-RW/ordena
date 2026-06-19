@@ -8,7 +8,7 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { PageHeader } from "@/components/page-header";
@@ -71,16 +71,19 @@ const STATUS_VARIANTS: Record<
   pendente: "outline",
 };
 
-function daysUntil(dateStr: string) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+function daysUntil(dateStr: string, today: Date) {
+  const t = new Date(today);
+  t.setHours(0, 0, 0, 0);
   const d = new Date(dateStr);
   d.setHours(0, 0, 0, 0);
-  return Math.round((d.getTime() - today.getTime()) / 86400000);
+  return Math.round((d.getTime() - t.getTime()) / 86400000);
 }
 
-function formatDateLabel(dateStr: string) {
-  const days = daysUntil(dateStr);
+function formatDateLabel(dateStr: string, today: Date | null) {
+  if (!today) {
+    return new Date(dateStr).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
+  }
+  const days = daysUntil(dateStr, today);
   if (days === 0) return "Hoje";
   if (days === 1) return "Amanhã";
   if (days < 0) return `Atrasada ${Math.abs(days)}d`;
@@ -103,6 +106,9 @@ const emptyForm: FormData = {
 export default function TarefasPage() {
   const { tarefas, disciplinas, addTarefa, updateTarefa, deleteTarefa, toggleTarefa } =
     useStore();
+
+  const [today, setToday] = useState<Date | null>(null);
+  useEffect(() => { setToday(new Date()); }, []);
 
   const [filterDisc, setFilterDisc] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
@@ -200,7 +206,7 @@ export default function TarefasPage() {
                 Filtros
               </span>
             </div>
-            <Select value={filterDisc} onValueChange={setFilterDisc}>
+            <Select value={filterDisc} onValueChange={(v) => setFilterDisc(v ?? "all")}>
               <SelectTrigger className="h-8 w-44 text-sm">
                 <SelectValue>{filterDisc === "all" ? "Todas as disciplinas" : (disciplinas.find(d => d.id === filterDisc)?.nome ?? "Disciplina")}</SelectValue>
               </SelectTrigger>
@@ -213,7 +219,7 @@ export default function TarefasPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v ?? "all")}>
               <SelectTrigger className="h-8 w-44 text-sm">
                 <SelectValue>{filterStatus === "all" ? "Todos os status" : filterStatus === "pendente" ? "Pendente" : filterStatus === "em_andamento" ? "Em andamento" : "Concluída"}</SelectValue>
               </SelectTrigger>
@@ -265,9 +271,9 @@ export default function TarefasPage() {
                   <div className="flex flex-col gap-2">
                     {group.items.map((tarefa) => {
                       const disc = discMap[tarefa.disciplinaId];
-                      const days = daysUntil(tarefa.prazo);
+                      const days = today ? daysUntil(tarefa.prazo, today) : null;
                       const isOverdue =
-                        days < 0 && tarefa.status !== "concluida";
+                        days !== null && days < 0 && tarefa.status !== "concluida";
 
                       return (
                         <div
@@ -327,7 +333,7 @@ export default function TarefasPage() {
                                 : "text-muted-foreground",
                             )}
                           >
-                            {formatDateLabel(tarefa.prazo)}
+                            {formatDateLabel(tarefa.prazo, today)}
                           </span>
 
                           {/* Actions */}
@@ -387,7 +393,7 @@ export default function TarefasPage() {
                 <Label>Disciplina</Label>
                 <Select
                   value={form.disciplinaId}
-                  onValueChange={(v) => setForm({ ...form, disciplinaId: v })}
+                  onValueChange={(v) => setForm({ ...form, disciplinaId: v ?? "" })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecionar..." />
@@ -416,7 +422,7 @@ export default function TarefasPage() {
               <Select
                 value={form.status}
                 onValueChange={(v) =>
-                  setForm({ ...form, status: v as TarefaStatus })
+                  setForm({ ...form, status: (v ?? "pendente") as TarefaStatus })
                 }
               >
                 <SelectTrigger>

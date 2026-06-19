@@ -275,7 +275,7 @@ export default function DesempenhoPage() {
                       border: "1px solid hsl(var(--border))",
                       fontSize: "12px",
                     }}
-                    formatter={(v: number) => [v.toFixed(1), "Média"]}
+                    formatter={(v) => [typeof v === "number" ? v.toFixed(1) : v, "Média"]}
                   />
                   <Bar dataKey="media" radius={[4, 4, 0, 0]}>
                     {chartData.map((entry, index) => (
@@ -301,7 +301,7 @@ export default function DesempenhoPage() {
                 {filteredNotas.length !== 1 ? "s" : ""}
               </CardDescription>
             </div>
-            <Select value={selectedDisc} onValueChange={setSelectedDisc}>
+            <Select value={selectedDisc} onValueChange={(v) => setSelectedDisc(v ?? "all")}>
               <SelectTrigger className="h-8 w-48 text-sm">
                 <SelectValue />
               </SelectTrigger>
@@ -418,7 +418,7 @@ export default function DesempenhoPage() {
               <Label>Disciplina</Label>
               <Select
                 value={form.disciplinaId}
-                onValueChange={(v) => setForm({ ...form, disciplinaId: v })}
+                onValueChange={(v) => setForm({ ...form, disciplinaId: v ?? "" })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar..." />

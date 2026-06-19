@@ -24,7 +24,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: Readonly<RootLayoutProps>) {
   return (
-    <html lang="pt" className={cn("h-full antialiased bg-background", geistSans.variable)}>
+    <html lang="pt" suppressHydrationWarning className={cn("h-full antialiased bg-background", geistSans.variable)}>
       <body className="min-h-full flex flex-col">
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
           <StoreProvider>

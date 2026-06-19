@@ -6,7 +6,7 @@ import {
   IconChevronRight,
   IconClock,
 } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { PageHeader } from "@/components/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -45,13 +45,17 @@ function isoDate(y: number, m: number, d: number) {
 export default function CalendarioPage() {
   const { tarefas, disciplinas } = useStore();
 
-  const today = new Date();
-  const [viewDate, setViewDate] = useState(
-    new Date(today.getFullYear(), today.getMonth(), 1),
-  );
-  const [selected, setSelected] = useState<string | null>(
-    isoDate(today.getFullYear(), today.getMonth(), today.getDate()),
-  );
+  const [todayStr, setTodayStr] = useState<string | null>(null);
+  const [viewDate, setViewDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+  const [selected, setSelected] = useState<string | null>(null);
+
+  useEffect(() => {
+    const now = new Date();
+    const str = isoDate(now.getFullYear(), now.getMonth(), now.getDate());
+    setTodayStr(str);
+    setSelected(str);
+    setViewDate(new Date(now.getFullYear(), now.getMonth(), 1));
+  }, []);
 
   const year = viewDate.getFullYear();
   const month = viewDate.getMonth();
@@ -85,16 +89,12 @@ export default function CalendarioPage() {
 
   // Upcoming events for sidebar
   const upcoming = useMemo(() => {
-    const todayStr = isoDate(
-      today.getFullYear(),
-      today.getMonth(),
-      today.getDate(),
-    );
+    if (!todayStr) return [];
     return tarefas
       .filter((t) => t.prazo >= todayStr && t.status !== "concluida")
       .sort((a, b) => a.prazo.localeCompare(b.prazo))
       .slice(0, 8);
-  }, [tarefas, today]);
+  }, [tarefas, todayStr]);
 
   function prevMonth() {
     setViewDate(new Date(year, month - 1, 1));
@@ -111,8 +111,6 @@ export default function CalendarioPage() {
       month: "short",
     });
   }
-
-  const todayStr = isoDate(today.getFullYear(), today.getMonth(), today.getDate());
 
   return (
     <div className="flex flex-col flex-1">
@@ -134,9 +132,11 @@ export default function CalendarioPage() {
                   variant="outline"
                   size="sm"
                   className="h-7 text-xs"
-                  onClick={() =>
-                    setViewDate(new Date(today.getFullYear(), today.getMonth(), 1))
-                  }
+                  onClick={() => {
+                    const now = new Date();
+                    setViewDate(new Date(now.getFullYear(), now.getMonth(), 1));
+                    setSelected(isoDate(now.getFullYear(), now.getMonth(), now.getDate()));
+                  }}
                 >
                   Hoje
                 </Button>
@@ -281,11 +281,13 @@ export default function CalendarioPage() {
             ) : (
               upcoming.map((t) => {
                 const disc = discMap[t.disciplinaId];
-                const days = Math.round(
-                  (new Date(t.prazo).setHours(0, 0, 0, 0) -
-                    new Date().setHours(0, 0, 0, 0)) /
-                    86400000,
-                );
+                const days = todayStr
+                  ? Math.round(
+                      (new Date(t.prazo + "T00:00:00").getTime() -
+                        new Date(todayStr + "T00:00:00").getTime()) /
+                        86400000,
+                    )
+                  : null;
                 return (
                   <button
                     key={t.id}
@@ -317,11 +319,13 @@ export default function CalendarioPage() {
                       </p>
                       <div className="flex items-center gap-1 text-xs text-muted-foreground">
                         <IconClock className="size-3" />
-                        {days === 0
-                          ? "Hoje"
-                          : days === 1
-                            ? "Amanhã"
-                            : `em ${days} dias`}
+                        {days === null
+                          ? formatDatePT(t.prazo)
+                          : days === 0
+                            ? "Hoje"
+                            : days === 1
+                              ? "Amanhã"
+                              : `em ${days} dias`}
                       </div>
                     </div>
                   </button>
