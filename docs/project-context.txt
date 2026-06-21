@@ -1,0 +1,44 @@
+Here is the English translation of your text, formatted for clarity and scannability:
+
+## **ORDENA: ACADEMIC ORGANIZATION PLATFORM**
+
+### **1 First Stage: Investigation and Problem Definition**
+
+#### **1.1 Problem description and contextualization**
+
+Ordena proposes to centralize tools for organizing courses, deadlines, tasks, and grades in a single place. This reduces the user's cognitive load and facilitates the tracking of submissions and the balance of academic life.
+
+#### **1.2 Target audience**
+
+University students who need to balance professional and academic demands. The predominant profile consists of young adults between 18 and 30 years old, familiar with digital tools and in need of organizing their weekly routine.
+
+#### **1.3 Interface objectives**
+
+* Centralize the management of courses, tasks, deadlines, and grades in a single environment;
+* Offer a weekly and monthly view of the academic workload;
+* Reduce cognitive load through a clear and hierarchical interface;
+* Provide immediate visual feedback on academic progress and performance.
+
+#### **1.4 Benchmarking**
+
+Four existing tools were analyzed: Notion, Todoist, Google Classroom, and MyStudyLife.
+
+* **Notion and Todoist:** Generic productivity platforms that require extensive manual configuration for academic use.
+* **Google Classroom:** Controlled by teachers, not allowing students to manage their own consolidated view.
+* **MyStudyLife:** Has an academic focus, but features an outdated interface and lacks performance visualization.
+
+> **Conclusion:** None of the analyzed solutions offer the combination of task management, calendar, and grade tracking in a single interface tailored to the Brazilian student.
+
+#### **1.5 Stakeholder map**
+
+* **University student:** Primary user; seeks organization and stress reduction.
+* **Working student:** Primary user with the additional need to balance routines.
+* **Advisor/pedagogical coordinator:** Secondary user; interested in identifying workload overloads.
+* **Development team:** Responsible for design and implementation decisions.
+
+#### **1.6 Main difficulties identified**
+
+* Fragmentation of information across multiple tools without integration;
+* Forgetting deadlines due to the lack of a consolidated view of the semester;
+* Difficulty prioritizing tasks in the face of multiple simultaneous demands;
+* Lack of real-time tracking of one's own academic performance.

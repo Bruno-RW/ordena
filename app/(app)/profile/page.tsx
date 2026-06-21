@@ -1,43 +1,40 @@
 "use client";
 
-import { IconMoon, IconSun, IconUser } from "@tabler/icons-react";
-import { useTheme } from "next-themes";
+import { IconMoon, IconSun } from "@tabler/icons-react";
+
 import { useEffect, useState } from "react";
+
+import { useTheme } from "next-themes";
+
 import { toast } from "sonner";
 
-import { PageHeader } from "@/components/page-header";
+import Header from "@/components/Header";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { useStore } from "@/context/store";
+import { useData } from "@/hooks/useData";
+import { StatusEnum } from "@/types/task";
 
 export default function PerfilPage() {
-  const { perfil, updatePerfil, disciplinas, tarefas, notas } = useStore();
+  const { profile, updateProfile, subjects, tasks, scores } = useData();
   const { theme, setTheme } = useTheme();
 
   const [form, setForm] = useState({
-    nome: perfil.nome,
-    curso: perfil.curso,
-    semestre: perfil.semestre,
+    name: profile.name,
+    course: profile.course,
+    semester: profile.semester,
   });
 
   // Sync when store changes externally
   useEffect(() => {
     setForm({
-      nome: perfil.nome,
-      curso: perfil.curso,
-      semestre: perfil.semestre,
+      name: profile.name,
+      course: profile.course,
+      semester: profile.semester,
     });
-  }, [perfil]);
+  }, [profile]);
 
   function getInitials(nome: string) {
     return nome
@@ -49,31 +46,33 @@ export default function PerfilPage() {
   }
 
   function handleSave() {
-    if (!form.nome.trim()) {
+    if (!form.name.trim()) {
       toast.error("O nome é obrigatório.");
       return;
     }
-    updatePerfil({
-      ...perfil,
-      nome: form.nome,
-      curso: form.curso,
-      semestre: form.semestre,
-      avatarInitials: getInitials(form.nome),
+    updateProfile({
+      ...profile,
+      name: form.name,
+      course: form.course,
+      semester: form.semester,
+      avatarInitials: getInitials(form.name),
     });
     toast.success("Perfil atualizado.");
   }
 
-  const concluidas = tarefas.filter((t) => t.status === "concluida").length;
-  const mediaGeral = (() => {
-    if (notas.length === 0) return null;
-    const totalPeso = notas.reduce((a, n) => a + n.peso, 0);
-    const soma = notas.reduce((a, n) => a + n.valor * n.peso, 0);
-    return totalPeso > 0 ? (soma / totalPeso).toFixed(1) : null;
+  const completedTasks = tasks.filter((t) => t.status === StatusEnum.COMPLETED).length;
+  const globalAverage = (() => {
+    if (scores.length === 0) return null;
+
+    const totalWeight = scores.reduce((a, n) => a + n.weight, 0);
+    const sum = scores.reduce((a, n) => a + n.value * n.weight, 0);
+
+    return totalWeight > 0 ? (sum / totalWeight).toFixed(1) : null;
   })();
 
   return (
     <div className="flex flex-col flex-1">
-      <PageHeader title="Perfil" description="Configurações da conta" />
+      <Header title="Perfil" description="Configurações da conta" />
 
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-6 max-w-2xl">
         {/* Profile Card */}
@@ -82,15 +81,14 @@ export default function PerfilPage() {
             <div className="flex items-center gap-4">
               <Avatar className="size-16">
                 <AvatarFallback className="text-lg font-semibold bg-primary/10 text-primary">
-                  {getInitials(form.nome)}
+                  {getInitials(form.name)}
                 </AvatarFallback>
               </Avatar>
+
               <div>
-                <h2 className="text-lg font-semibold text-foreground">
-                  {perfil.nome}
-                </h2>
+                <h2 className="text-lg font-semibold text-foreground">{profile.name}</h2>
                 <p className="text-sm text-muted-foreground">
-                  {perfil.curso} · {perfil.semestre}º semestre
+                  {profile.course} · {profile.semester}º semestre
                 </p>
               </div>
             </div>
@@ -100,9 +98,9 @@ export default function PerfilPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: "Disciplinas", value: disciplinas.length },
-            { label: "Tarefas concluídas", value: concluidas },
-            { label: "Média geral", value: mediaGeral ?? "–" },
+            { label: "Disciplinas", value: subjects.length },
+            { label: "Tarefas concluídas", value: completedTasks },
+            { label: "Média geral", value: globalAverage ?? "–" },
           ].map((s) => (
             <Card key={s.label}>
               <CardContent className="pt-4 pb-4 flex flex-col gap-1">
@@ -116,48 +114,48 @@ export default function PerfilPage() {
         {/* Edit Form */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm font-semibold">
-              Editar informações
-            </CardTitle>
-            <CardDescription>
-              Atualize seus dados pessoais e acadêmicos.
-            </CardDescription>
+            <CardTitle className="text-sm font-semibold">Editar informações</CardTitle>
+            <CardDescription>Atualize seus dados pessoais e acadêmicos.</CardDescription>
           </CardHeader>
+
           <CardContent className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="nome">Nome completo</Label>
+              <Label htmlFor="name">Nome completo</Label>
               <Input
-                id="nome"
-                value={form.nome}
-                onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                id="name"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Seu nome"
               />
             </div>
+
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="curso">Curso</Label>
+              <Label htmlFor="course">Curso</Label>
               <Input
-                id="curso"
-                value={form.curso}
-                onChange={(e) => setForm({ ...form, curso: e.target.value })}
+                id="course"
+                value={form.course}
+                onChange={(e) => setForm({ ...form, course: e.target.value })}
                 placeholder="Ex: Ciência da Computação"
               />
             </div>
+
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="semestre">Semestre atual</Label>
+              <Label htmlFor="semester">Semestre atual</Label>
               <Input
-                id="semestre"
+                id="semester"
                 type="number"
                 min={1}
                 max={20}
-                value={form.semestre}
+                value={form.semester}
                 onChange={(e) =>
                   setForm({
                     ...form,
-                    semestre: parseInt(e.target.value) || 1,
+                    semester: parseInt(e.target.value) || 1,
                   })
                 }
               />
             </div>
+
             <Button onClick={handleSave} className="self-start">
               Salvar alterações
             </Button>
@@ -168,10 +166,9 @@ export default function PerfilPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-sm font-semibold">Aparência</CardTitle>
-            <CardDescription>
-              Escolha entre tema claro e escuro.
-            </CardDescription>
+            <CardDescription>Escolha entre tema claro e escuro.</CardDescription>
           </CardHeader>
+
           <CardContent>
             <div className="flex gap-3">
               <button
@@ -184,10 +181,9 @@ export default function PerfilPage() {
                 }`}
               >
                 <IconSun className="size-5 text-foreground" />
-                <span className="text-xs font-medium text-foreground">
-                  Claro
-                </span>
+                <span className="text-xs font-medium text-foreground">Claro</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setTheme("dark")}
@@ -198,9 +194,7 @@ export default function PerfilPage() {
                 }`}
               >
                 <IconMoon className="size-5 text-foreground" />
-                <span className="text-xs font-medium text-foreground">
-                  Escuro
-                </span>
+                <span className="text-xs font-medium text-foreground">Escuro</span>
               </button>
             </div>
           </CardContent>

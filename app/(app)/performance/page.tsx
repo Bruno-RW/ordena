@@ -1,19 +1,14 @@
 "use client";
 
-import {
-  IconEdit,
-  IconPlus,
-  IconTrash,
-  IconTrophy,
-} from "@tabler/icons-react";
+import { IconEdit, IconPlus, IconTrash, IconTrophy } from "@tabler/icons-react";
+
 import { useMemo, useState } from "react";
+
 import {
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  RadialBar,
-  RadialBarChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -21,7 +16,7 @@ import {
 } from "recharts";
 import { toast } from "sonner";
 
-import { PageHeader } from "@/components/page-header";
+import Header from "@/components/Header";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,13 +29,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -58,110 +47,120 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useStore } from "@/context/store";
-import type { Nota } from "@/data/mock";
+import { useData } from "@/hooks/useData";
 import { cn } from "@/lib/utils";
+import { Score } from "@/types/score";
 
-type FormData = Omit<Nota, "id">;
+type FormData = Omit<Score, "id">;
 
 const emptyForm: FormData = {
-  disciplinaId: "",
-  descricao: "",
-  valor: 0,
-  peso: 1,
+  subjectId: "",
+  description: "",
+  value: 0,
+  weight: 1,
 };
 
-function mediaDisc(notas: Nota[]) {
-  if (notas.length === 0) return null;
-  const totalPeso = notas.reduce((a, n) => a + n.peso, 0);
-  const soma = notas.reduce((a, n) => a + n.valor * n.peso, 0);
-  return totalPeso > 0 ? soma / totalPeso : null;
+function subjectAverage(scores: Score[]) {
+  if (scores.length === 0) return null;
+
+  const totalWeight = scores.reduce((a, n) => a + n.weight, 0);
+  const sum = scores.reduce((a, n) => a + n.value * n.weight, 0);
+
+  return totalWeight > 0 ? sum / totalWeight : null;
 }
 
 export default function DesempenhoPage() {
-  const { notas, disciplinas, addNota, updateNota, deleteNota } = useStore();
+  const { scores, subjects, addScore, updateScore, deleteScore } = useData();
 
-  const [selectedDisc, setSelectedDisc] = useState<string>("all");
+  const [selectedSubject, setSelectedSubject] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Nota | null>(null);
+  const [editing, setEditing] = useState<Score | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
 
-  const discMap = useMemo(
-    () => Object.fromEntries(disciplinas.map((d) => [d.id, d])),
-    [disciplinas],
-  );
+  const subjectMap = useMemo(() => Object.fromEntries(subjects.map((d) => [d.id, d])), [subjects]);
 
-  const mediaGeral = useMemo(() => mediaDisc(notas), [notas]);
+  const globalAverage = useMemo(() => subjectAverage(scores), [scores]);
 
-  const discData = useMemo(() => {
-    return disciplinas.map((d) => {
-      const dns = notas.filter((n) => n.disciplinaId === d.id);
-      const media = mediaDisc(dns);
-      return { id: d.id, nome: d.nome, cor: d.cor, media, notas: dns };
+  const subjectData = useMemo(() => {
+    return subjects.map((d) => {
+      const dns = scores.filter((n) => n.subjectId === d.id);
+      const average = subjectAverage(dns);
+
+      return {
+        id: d.id,
+        name: d.name,
+        color: d.color,
+        average,
+        scores,
+        dns,
+      };
     });
-  }, [disciplinas, notas]);
+  }, [subjects, scores]);
 
   const chartData = useMemo(
     () =>
-      discData
-        .filter((d) => d.media !== null)
+      subjectData
+        .filter((d) => d.average !== null)
         .map((d) => ({
-          nome: d.nome.split(" ").slice(0, 2).join(" "),
-          media: parseFloat((d.media ?? 0).toFixed(1)),
-          cor: d.cor,
+          name: d.name.split(" ").slice(0, 2).join(" "),
+          average: parseFloat((d.average ?? 0).toFixed(1)),
+          color: d.color,
         })),
-    [discData],
+    [subjectData]
   );
 
-  const filteredNotas = useMemo(() => {
-    if (selectedDisc === "all") return notas;
-    return notas.filter((n) => n.disciplinaId === selectedDisc);
-  }, [notas, selectedDisc]);
+  const filteredScores = useMemo(() => {
+    if (selectedSubject === "all") return scores;
+    return scores.filter((n) => n.subjectId === selectedSubject);
+  }, [scores, selectedSubject]);
 
   function openAdd() {
     setEditing(null);
     setForm({
       ...emptyForm,
-      disciplinaId:
-        selectedDisc !== "all" ? selectedDisc : disciplinas[0]?.id ?? "",
+      subjectId: selectedSubject !== "all" ? selectedSubject : (subjects[0]?.id ?? ""),
     });
     setDialogOpen(true);
   }
 
-  function openEdit(n: Nota) {
+  function openEdit(n: Score) {
     setEditing(n);
     setForm({
-      disciplinaId: n.disciplinaId,
-      descricao: n.descricao,
-      valor: n.valor,
-      peso: n.peso,
+      subjectId: n.subjectId,
+      description: n.description,
+      value: n.value,
+      weight: n.weight,
     });
     setDialogOpen(true);
   }
 
   function handleSave() {
-    if (!form.descricao.trim()) {
+    if (!form.description.trim()) {
       toast.error("A descrição é obrigatória.");
       return;
     }
-    if (form.valor < 0 || form.valor > 10) {
+
+    if (form.value < 0 || form.value > 10) {
       toast.error("A nota deve estar entre 0 e 10.");
       return;
     }
+
     if (editing) {
-      updateNota({ ...editing, ...form });
+      updateScore({ ...editing, ...form });
       toast.success("Nota atualizada.");
     } else {
-      addNota(form);
+      addScore(form);
       toast.success("Nota adicionada.");
     }
+
     setDialogOpen(false);
   }
 
   function handleDelete() {
     if (!deleteId) return;
-    deleteNota(deleteId);
+
+    deleteScore(deleteId);
     toast.success("Nota removida.");
     setDeleteId(null);
   }
@@ -175,12 +174,12 @@ export default function DesempenhoPage() {
 
   return (
     <div className="flex flex-col flex-1">
-      <PageHeader title="Desempenho" description="Notas e médias">
+      <Header title="Desempenho" description="Notas e médias">
         <Button size="sm" onClick={openAdd}>
           <IconPlus data-icon="inline-start" />
           Registrar nota
         </Button>
-      </PageHeader>
+      </Header>
 
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-6">
         {/* Overview */}
@@ -192,43 +191,32 @@ export default function DesempenhoPage() {
                 Média geral
               </CardDescription>
             </CardHeader>
+
             <CardContent>
-              <p
-                className={cn(
-                  "text-4xl font-bold",
-                  mediaColor(mediaGeral),
-                )}
-              >
-                {mediaGeral !== null ? mediaGeral.toFixed(1) : "–"}
+              <p className={cn("text-4xl font-bold", mediaColor(globalAverage))}>
+                {globalAverage !== null ? globalAverage.toFixed(1) : "–"}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                de 10,0
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
             </CardContent>
           </Card>
 
-          {discData.slice(0, 3).map((d) => (
+          {subjectData.slice(0, 3).map((d) => (
             <Card key={d.id}>
               <CardHeader className="pb-2">
                 <CardDescription className="flex items-center gap-1.5 truncate">
                   <div
                     className="size-2.5 rounded-full shrink-0"
-                    style={{ backgroundColor: d.cor }}
+                    style={{ backgroundColor: d.color }}
                   />
-                  <span className="truncate">{d.nome}</span>
+                  <span className="truncate">{d.name}</span>
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p
-                  className={cn(
-                    "text-3xl font-bold",
-                    mediaColor(d.media),
-                  )}
-                >
-                  {d.media !== null ? d.media.toFixed(1) : "–"}
+                <p className={cn("text-3xl font-bold", mediaColor(d.average))}>
+                  {d.average !== null ? d.average.toFixed(1) : "–"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {d.notas.length} nota{d.notas.length !== 1 ? "s" : ""}
+                  {d.scores.length} nota{d.scores.length !== 1 ? "s" : ""}
                 </p>
               </CardContent>
             </Card>
@@ -239,36 +227,28 @@ export default function DesempenhoPage() {
         {chartData.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle className="text-sm font-semibold">
-                Médias por disciplina
-              </CardTitle>
-              <CardDescription>
-                Visualização do desempenho semestral
-              </CardDescription>
+              <CardTitle className="text-sm font-semibold">Médias por disciplina</CardTitle>
+              <CardDescription>Visualização do desempenho semestral</CardDescription>
             </CardHeader>
+
             <CardContent>
               <ResponsiveContainer width="100%" height={200}>
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 4, right: 8, left: -20, bottom: 0 }}
-                >
+                <BarChart data={chartData} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
                   <CartesianGrid
                     strokeDasharray="3 3"
                     stroke="hsl(var(--border) / 0.5)"
                     vertical={false}
                   />
-                  <XAxis
-                    dataKey="nome"
-                    tick={{ fontSize: 11 }}
-                    axisLine={false}
-                    tickLine={false}
-                  />
+
+                  <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
+
                   <YAxis
                     domain={[0, 10]}
                     tick={{ fontSize: 11 }}
                     axisLine={false}
                     tickLine={false}
                   />
+
                   <Tooltip
                     contentStyle={{
                       borderRadius: "8px",
@@ -277,9 +257,10 @@ export default function DesempenhoPage() {
                     }}
                     formatter={(v) => [typeof v === "number" ? v.toFixed(1) : v, "Média"]}
                   />
+
                   <Bar dataKey="media" radius={[4, 4, 0, 0]}>
                     {chartData.map((entry, index) => (
-                      <Cell key={index} fill={entry.cor} />
+                      <Cell key={index} fill={entry.color} />
                     ))}
                   </Bar>
                 </BarChart>
@@ -292,31 +273,32 @@ export default function DesempenhoPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
             <div>
-              <CardTitle className="text-sm font-semibold">
-                Registro de notas
-              </CardTitle>
+              <CardTitle className="text-sm font-semibold">Registro de notas</CardTitle>
               <CardDescription>
-                {filteredNotas.length} nota
-                {filteredNotas.length !== 1 ? "s" : ""} registrada
-                {filteredNotas.length !== 1 ? "s" : ""}
+                {filteredScores.length} nota
+                {filteredScores.length !== 1 ? "s" : ""} registrada
+                {filteredScores.length !== 1 ? "s" : ""}
               </CardDescription>
             </div>
-            <Select value={selectedDisc} onValueChange={(v) => setSelectedDisc(v ?? "all")}>
+
+            <Select value={selectedSubject} onValueChange={(v) => setSelectedSubject(v ?? "all")}>
               <SelectTrigger className="h-8 w-48 text-sm">
                 <SelectValue />
               </SelectTrigger>
+
               <SelectContent>
                 <SelectItem value="all">Todas as disciplinas</SelectItem>
-                {disciplinas.map((d) => (
+                {subjects.map((d) => (
                   <SelectItem key={d.id} value={d.id}>
-                    {d.nome}
+                    {d.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </CardHeader>
+
           <CardContent>
-            {filteredNotas.length === 0 ? (
+            {filteredScores.length === 0 ? (
               <div className="flex flex-col items-center py-10 gap-2 text-muted-foreground text-sm">
                 <p>Nenhuma nota registrada.</p>
                 <Button variant="outline" size="sm" onClick={openAdd}>
@@ -327,23 +309,19 @@ export default function DesempenhoPage() {
             ) : (
               <div className="flex flex-col gap-2">
                 {/* Group by disciplina */}
-                {discData.map((d) => {
-                  const dns = filteredNotas.filter(
-                    (n) => n.disciplinaId === d.id,
-                  );
+                {subjectData.map((d) => {
+                  const dns = filteredScores.filter((n) => n.subjectId === d.id);
                   if (dns.length === 0) return null;
-                  const media = mediaDisc(dns);
+                  const media = subjectAverage(dns);
                   return (
                     <div key={d.id} className="flex flex-col gap-2 mb-2">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <div
                             className="size-2.5 rounded-full"
-                            style={{ backgroundColor: d.cor }}
+                            style={{ backgroundColor: d.color }}
                           />
-                          <span className="text-sm font-semibold text-foreground">
-                            {d.nome}
-                          </span>
+                          <span className="text-sm font-semibold text-foreground">{d.name}</span>
                         </div>
                         {media !== null && (
                           <Badge
@@ -360,19 +338,15 @@ export default function DesempenhoPage() {
                           key={n.id}
                           className="flex items-center gap-3 rounded-lg border border-border px-3 py-2 ml-4"
                         >
-                          <span className="flex-1 text-sm text-foreground">
-                            {n.descricao}
-                          </span>
-                          <span className="text-xs text-muted-foreground">
-                            Peso {n.peso}
-                          </span>
+                          <span className="flex-1 text-sm text-foreground">{n.description}</span>
+                          <span className="text-xs text-muted-foreground">Peso {n.weight}</span>
                           <span
                             className={cn(
                               "text-base font-bold w-10 text-right",
-                              mediaColor(n.valor),
+                              mediaColor(n.value)
                             )}
                           >
-                            {n.valor.toFixed(1)}
+                            {n.value.toFixed(1)}
                           </span>
                           <div className="flex gap-1">
                             <Button
@@ -408,68 +382,64 @@ export default function DesempenhoPage() {
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{editing ? "Editar nota" : "Registrar nota"}</DialogTitle>
-            <DialogDescription>
-              Preencha os dados da nota.
-            </DialogDescription>
+            <DialogDescription>Preencha os dados da nota.</DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
               <Label>Disciplina</Label>
+
               <Select
-                value={form.disciplinaId}
-                onValueChange={(v) => setForm({ ...form, disciplinaId: v ?? "" })}
+                value={form.subjectId}
+                onValueChange={(v) => setForm({ ...form, subjectId: v ?? "" })}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Selecionar..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {disciplinas.map((d) => (
+                  {subjects.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
-                      {d.nome}
+                      {d.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
+
             <div className="flex flex-col gap-1.5">
               <Label htmlFor="descricao">Avaliação *</Label>
               <Input
-                id="descricao"
-                value={form.descricao}
-                onChange={(e) =>
-                  setForm({ ...form, descricao: e.target.value })
-                }
+                id="description"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="Ex: Prova P1"
               />
             </div>
+
             <div className="grid grid-cols-2 gap-3">
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="valor">Nota (0–10)</Label>
+                <Label htmlFor="value">Nota (0–10)</Label>
                 <Input
-                  id="valor"
+                  id="value"
                   type="number"
                   min={0}
                   max={10}
                   step={0.1}
-                  value={form.valor}
-                  onChange={(e) =>
-                    setForm({ ...form, valor: parseFloat(e.target.value) || 0 })
-                  }
+                  value={form.value}
+                  onChange={(e) => setForm({ ...form, value: parseFloat(e.target.value) || 0 })}
                 />
               </div>
+
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="peso">Peso</Label>
+                <Label htmlFor="weight">Peso</Label>
                 <Input
                   id="peso"
                   type="number"
                   min={1}
                   max={5}
                   step={1}
-                  value={form.peso}
-                  onChange={(e) =>
-                    setForm({ ...form, peso: parseInt(e.target.value) || 1 })
-                  }
+                  value={form.weight}
+                  onChange={(e) => setForm({ ...form, weight: parseInt(e.target.value) || 1 })}
                 />
               </div>
             </div>
@@ -479,25 +449,19 @@ export default function DesempenhoPage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleSave}>
-              {editing ? "Salvar alterações" : "Registrar"}
-            </Button>
+            <Button onClick={handleSave}>{editing ? "Salvar alterações" : "Registrar"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete */}
-      <AlertDialog
-        open={!!deleteId}
-        onOpenChange={(o) => !o && setDeleteId(null)}
-      >
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remover nota?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
           </AlertDialogHeader>
+
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction

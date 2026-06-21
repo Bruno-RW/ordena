@@ -8,10 +8,13 @@ import {
   IconPlus,
   IconTrash,
 } from "@tabler/icons-react";
+
 import { useEffect, useMemo, useState } from "react";
+
 import { toast } from "sonner";
 
-import { PageHeader } from "@/components/page-header";
+import { STATUS_LABELS, STATUS_VARIANTS } from "@/app/(app)/tasks/constants";
+import Header from "@/components/Header";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,13 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -48,28 +45,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
-import { useStore } from "@/context/store";
-import type { Tarefa } from "@/data/mock";
+import { useData } from "@/hooks/useData";
 import { cn } from "@/lib/utils";
-
-type TarefaStatus = Tarefa["status"];
-
-const STATUS_LABELS: Record<TarefaStatus, string> = {
-  pendente: "Pendente",
-  em_andamento: "Em andamento",
-  concluida: "Concluída",
-};
-
-const STATUS_VARIANTS: Record<
-  TarefaStatus,
-  "default" | "secondary" | "outline" | "destructive"
-> = {
-  concluida: "default",
-  em_andamento: "secondary",
-  pendente: "outline",
-};
+import { StatusEnum, Task } from "@/types/task";
 
 function daysUntil(dateStr: string, today: Date) {
   const t = new Date(today);
@@ -93,77 +72,75 @@ function formatDateLabel(dateStr: string, today: Date | null) {
   });
 }
 
-type FormData = Omit<Tarefa, "id">;
+type FormData = Omit<Task, "id">;
 
 const emptyForm: FormData = {
-  titulo: "",
-  disciplinaId: "",
-  prazo: "",
-  status: "pendente",
-  descricao: "",
+  title: "",
+  subjectId: "",
+  deadline: "",
+  status: StatusEnum.PENDING,
+  description: "",
 };
 
 export default function TarefasPage() {
-  const { tarefas, disciplinas, addTarefa, updateTarefa, deleteTarefa, toggleTarefa } =
-    useStore();
+  const { tasks, subjects, addTask, updateTask, deleteTask, toggleTask } = useData();
 
   const [today, setToday] = useState<Date | null>(null);
-  useEffect(() => { setToday(new Date()); }, []);
+  useEffect(() => setToday(new Date()), []);
 
   const [filterDisc, setFilterDisc] = useState<string>("all");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Tarefa | null>(null);
+  const [editing, setEditing] = useState<Task | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
 
-  const discMap = useMemo(
-    () => Object.fromEntries(disciplinas.map((d) => [d.id, d])),
-    [disciplinas],
-  );
+  const subjectMap = useMemo(() => Object.fromEntries(subjects.map((d) => [d.id, d])), [subjects]);
 
   const filtered = useMemo(() => {
-    return tarefas
-      .filter((t) => filterDisc === "all" || t.disciplinaId === filterDisc)
+    return tasks
+      .filter((t) => filterDisc === "all" || t.subjectId === filterDisc)
       .filter((t) => filterStatus === "all" || t.status === filterStatus)
-      .sort((a, b) => new Date(a.prazo).getTime() - new Date(b.prazo).getTime());
-  }, [tarefas, filterDisc, filterStatus]);
+      .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
+  }, [tasks, filterDisc, filterStatus]);
 
   function openAdd() {
     setEditing(null);
     setForm({
       ...emptyForm,
-      disciplinaId: disciplinas[0]?.id ?? "",
+      subjectId: subjects[0]?.id ?? "",
     });
     setDialogOpen(true);
   }
 
-  function openEdit(t: Tarefa) {
+  function openEdit(t: Task) {
     setEditing(t);
     setForm({
-      titulo: t.titulo,
-      disciplinaId: t.disciplinaId,
-      prazo: t.prazo,
+      title: t.title,
+      subjectId: t.subjectId,
+      deadline: t.deadline,
       status: t.status,
-      descricao: t.descricao ?? "",
+      description: t.description ?? "",
     });
     setDialogOpen(true);
   }
 
   function handleSave() {
-    if (!form.titulo.trim()) {
+    if (!form.title.trim()) {
       toast.error("O título da tarefa é obrigatório.");
       return;
     }
-    if (!form.prazo) {
+
+    if (!form.deadline) {
       toast.error("O prazo é obrigatório.");
       return;
     }
+
     if (editing) {
-      updateTarefa({ ...editing, ...form });
+      updateTask({ ...editing, ...form });
       toast.success("Tarefa atualizada.");
     } else {
-      addTarefa(form);
+      addTask(form);
       toast.success("Tarefa adicionada.");
     }
     setDialogOpen(false);
@@ -171,30 +148,31 @@ export default function TarefasPage() {
 
   function handleDelete() {
     if (!deleteId) return;
-    deleteTarefa(deleteId);
+    deleteTask(deleteId);
     toast.success("Tarefa removida.");
     setDeleteId(null);
   }
 
   const groups = useMemo(() => {
-    const pending = filtered.filter((t) => t.status === "pendente");
-    const ongoing = filtered.filter((t) => t.status === "em_andamento");
-    const done = filtered.filter((t) => t.status === "concluida");
+    const pending = filtered.filter((t) => t.status === StatusEnum.PENDING);
+    const ongoing = filtered.filter((t) => t.status === StatusEnum.IN_PROGRESS);
+    const done = filtered.filter((t) => t.status === StatusEnum.COMPLETED);
+
     return [
-      { key: "pendente", label: "Pendentes", items: pending },
-      { key: "em_andamento", label: "Em andamento", items: ongoing },
-      { key: "concluida", label: "Concluídas", items: done },
+      { key: "pending", label: "Pendentes", items: pending },
+      { key: "in_progress", label: "Em andamento", items: ongoing },
+      { key: "completed", label: "Concluídas", items: done },
     ].filter((g) => g.items.length > 0 || filterStatus === "all");
   }, [filtered, filterStatus]);
 
   return (
     <div className="flex flex-col flex-1">
-      <PageHeader title="Tarefas" description="Lista e filtros">
+      <Header title="Tarefas" description="Lista e filtros">
         <Button size="sm" onClick={openAdd}>
           <IconPlus data-icon="inline-start" />
           Nova tarefa
         </Button>
-      </PageHeader>
+      </Header>
 
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-4">
         {/* Filters */}
@@ -202,27 +180,41 @@ export default function TarefasPage() {
           <CardContent className="flex flex-wrap gap-3 py-3">
             <div className="flex items-center gap-2">
               <IconFilter className="size-4 text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">
-                Filtros
-              </span>
+              <span className="text-sm font-medium text-foreground">Filtros</span>
             </div>
+
             <Select value={filterDisc} onValueChange={(v) => setFilterDisc(v ?? "all")}>
               <SelectTrigger className="h-8 w-44 text-sm">
-                <SelectValue>{filterDisc === "all" ? "Todas as disciplinas" : (disciplinas.find(d => d.id === filterDisc)?.nome ?? "Disciplina")}</SelectValue>
+                <SelectValue>
+                  {filterDisc === "all"
+                    ? "Todas as disciplinas"
+                    : (subjects.find((d) => d.id === filterDisc)?.name ?? "Disciplina")}
+                </SelectValue>
               </SelectTrigger>
+
               <SelectContent>
                 <SelectItem value="all">Todas as disciplinas</SelectItem>
-                {disciplinas.map((d) => (
+                {subjects.map((d) => (
                   <SelectItem key={d.id} value={d.id}>
-                    {d.nome}
+                    {d.name}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
+
             <Select value={filterStatus} onValueChange={(v) => setFilterStatus(v ?? "all")}>
               <SelectTrigger className="h-8 w-44 text-sm">
-                <SelectValue>{filterStatus === "all" ? "Todos os status" : filterStatus === "pendente" ? "Pendente" : filterStatus === "em_andamento" ? "Em andamento" : "Concluída"}</SelectValue>
+                <SelectValue>
+                  {filterStatus === "all"
+                    ? "Todos os status"
+                    : filterStatus === StatusEnum.PENDING
+                      ? "Pendente"
+                      : filterStatus === StatusEnum.IN_PROGRESS
+                        ? "Em andamento"
+                        : "Concluída"}
+                </SelectValue>
               </SelectTrigger>
+
               <SelectContent>
                 <SelectItem value="all">Todos os status</SelectItem>
                 <SelectItem value="pendente">Pendente</SelectItem>
@@ -263,39 +255,37 @@ export default function TarefasPage() {
               group.items.length === 0 ? null : (
                 <div key={group.key} className="flex flex-col gap-3">
                   <div className="flex items-center gap-2">
-                    <h2 className="text-sm font-semibold text-foreground">
-                      {group.label}
-                    </h2>
+                    <h2 className="text-sm font-semibold text-foreground">{group.label}</h2>
                     <Badge variant="secondary">{group.items.length}</Badge>
                   </div>
                   <div className="flex flex-col gap-2">
-                    {group.items.map((tarefa) => {
-                      const disc = discMap[tarefa.disciplinaId];
-                      const days = today ? daysUntil(tarefa.prazo, today) : null;
+                    {group.items.map((t) => {
+                      const disc = subjectMap[t.subjectId];
+                      const days = today ? daysUntil(t.deadline, today) : null;
                       const isOverdue =
-                        days !== null && days < 0 && tarefa.status !== "concluida";
+                        days !== null && days < 0 && t.status !== StatusEnum.COMPLETED;
 
                       return (
                         <div
-                          key={tarefa.id}
+                          key={t.id}
                           className={cn(
                             "flex items-center gap-3 rounded-lg border border-border bg-card px-3 py-2.5",
-                            tarefa.status === "concluida" && "opacity-60",
+                            t.status === StatusEnum.COMPLETED && "opacity-60"
                           )}
                         >
                           {/* Toggle */}
                           <button
                             type="button"
-                            onClick={() => toggleTarefa(tarefa.id)}
+                            onClick={() => toggleTask(t.id)}
                             className={cn(
                               "size-5 shrink-0 rounded-full border-2 flex items-center justify-center transition-colors",
-                              tarefa.status === "concluida"
+                              t.status === StatusEnum.COMPLETED
                                 ? "bg-primary border-primary"
-                                : "border-muted-foreground hover:border-primary",
+                                : "border-muted-foreground hover:border-primary"
                             )}
                             aria-label="Alternar status"
                           >
-                            {tarefa.status === "concluida" && (
+                            {t.status === StatusEnum.COMPLETED && (
                               <IconCheck className="size-3 text-primary-foreground" />
                             )}
                           </button>
@@ -305,22 +295,22 @@ export default function TarefasPage() {
                             <span
                               className={cn(
                                 "text-sm font-medium text-foreground truncate",
-                                tarefa.status === "concluida" &&
-                                  "line-through text-muted-foreground",
+                                t.status === StatusEnum.COMPLETED &&
+                                  "line-through text-muted-foreground"
                               )}
                             >
-                              {tarefa.titulo}
+                              {t.title}
                             </span>
                             {disc && (
                               <span
                                 className="text-xs px-1.5 py-0.5 rounded-sm font-medium text-white shrink-0"
-                                style={{ backgroundColor: disc.cor }}
+                                style={{ backgroundColor: disc.color }}
                               >
-                                {disc.nome}
+                                {disc.name}
                               </span>
                             )}
-                            <Badge variant={STATUS_VARIANTS[tarefa.status]}>
-                              {STATUS_LABELS[tarefa.status]}
+                            <Badge variant={STATUS_VARIANTS[t.status]}>
+                              {STATUS_LABELS[t.status]}
                             </Badge>
                           </div>
 
@@ -328,12 +318,10 @@ export default function TarefasPage() {
                           <span
                             className={cn(
                               "text-xs shrink-0 font-medium",
-                              isOverdue
-                                ? "text-destructive"
-                                : "text-muted-foreground",
+                              isOverdue ? "text-destructive" : "text-muted-foreground"
                             )}
                           >
-                            {formatDateLabel(tarefa.prazo, today)}
+                            {formatDateLabel(t.deadline, today)}
                           </span>
 
                           {/* Actions */}
@@ -342,15 +330,16 @@ export default function TarefasPage() {
                               variant="ghost"
                               size="icon"
                               className="size-7"
-                              onClick={() => openEdit(tarefa)}
+                              onClick={() => openEdit(t)}
                             >
                               <IconEdit className="size-3.5" />
                             </Button>
+
                             <Button
                               variant="ghost"
                               size="icon"
                               className="size-7 text-destructive hover:text-destructive"
-                              onClick={() => setDeleteId(tarefa.id)}
+                              onClick={() => setDeleteId(t.id)}
                             >
                               <IconTrash className="size-3.5" />
                             </Button>
@@ -360,7 +349,7 @@ export default function TarefasPage() {
                     })}
                   </div>
                 </div>
-              ),
+              )
             )}
           </div>
         )}
@@ -370,21 +359,17 @@ export default function TarefasPage() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>
-              {editing ? "Editar tarefa" : "Nova tarefa"}
-            </DialogTitle>
-            <DialogDescription>
-              Preencha os dados da tarefa.
-            </DialogDescription>
+            <DialogTitle>{editing ? "Editar tarefa" : "Nova tarefa"}</DialogTitle>
+            <DialogDescription>Preencha os dados da tarefa.</DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="titulo">Título *</Label>
+              <Label htmlFor="title">Título *</Label>
               <Input
-                id="titulo"
-                value={form.titulo}
-                onChange={(e) => setForm({ ...form, titulo: e.target.value })}
+                id="title"
+                value={form.title}
+                onChange={(e) => setForm({ ...form, title: e.target.value })}
                 placeholder="Ex: Lista 3 – Derivadas"
               />
             </div>
@@ -392,57 +377,60 @@ export default function TarefasPage() {
               <div className="flex flex-col gap-1.5">
                 <Label>Disciplina</Label>
                 <Select
-                  value={form.disciplinaId}
-                  onValueChange={(v) => setForm({ ...form, disciplinaId: v ?? "" })}
+                  value={form.subjectId}
+                  onValueChange={(v) => setForm({ ...form, subjectId: v ?? "" })}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecionar..." />
                   </SelectTrigger>
+
                   <SelectContent>
-                    {disciplinas.map((d) => (
+                    {subjects.map((d) => (
                       <SelectItem key={d.id} value={d.id}>
-                        {d.nome}
+                        {d.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
+
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="prazo">Prazo *</Label>
+                <Label htmlFor="deadline">Prazo *</Label>
                 <Input
-                  id="prazo"
+                  id="deadline"
                   type="date"
-                  value={form.prazo}
-                  onChange={(e) => setForm({ ...form, prazo: e.target.value })}
+                  value={form.deadline}
+                  onChange={(e) => setForm({ ...form, deadline: e.target.value })}
                 />
               </div>
             </div>
+
             <div className="flex flex-col gap-1.5">
               <Label>Status</Label>
               <Select
                 value={form.status}
                 onValueChange={(v) =>
-                  setForm({ ...form, status: (v ?? "pendente") as TarefaStatus })
+                  setForm({ ...form, status: (v ?? StatusEnum.PENDING) as StatusEnum })
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
+
                 <SelectContent>
-                  <SelectItem value="pendente">Pendente</SelectItem>
-                  <SelectItem value="em_andamento">Em andamento</SelectItem>
-                  <SelectItem value="concluida">Concluída</SelectItem>
+                  <SelectItem value={StatusEnum.PENDING}>Pendente</SelectItem>
+                  <SelectItem value={StatusEnum.IN_PROGRESS}>Em andamento</SelectItem>
+                  <SelectItem value={StatusEnum.COMPLETED}>Concluída</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+
             <div className="flex flex-col gap-1.5">
-              <Label htmlFor="descricao">Descrição</Label>
+              <Label htmlFor="description">Descrição</Label>
               <Textarea
-                id="descricao"
-                value={form.descricao}
-                onChange={(e) =>
-                  setForm({ ...form, descricao: e.target.value })
-                }
+                id="description"
+                value={form.description}
+                onChange={(e) => setForm({ ...form, description: e.target.value })}
                 placeholder="Detalhes opcionais..."
                 rows={3}
               />
@@ -453,25 +441,20 @@ export default function TarefasPage() {
             <Button variant="outline" onClick={() => setDialogOpen(false)}>
               Cancelar
             </Button>
-            <Button onClick={handleSave}>
-              {editing ? "Salvar alterações" : "Adicionar"}
-            </Button>
+
+            <Button onClick={handleSave}>{editing ? "Salvar alterações" : "Adicionar"}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Delete */}
-      <AlertDialog
-        open={!!deleteId}
-        onOpenChange={(o) => !o && setDeleteId(null)}
-      >
+      <AlertDialog open={!!deleteId} onOpenChange={(o) => !o && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Remover tarefa?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta ação não pode ser desfeita.
-            </AlertDialogDescription>
+            <AlertDialogDescription>Esta ação não pode ser desfeita.</AlertDialogDescription>
           </AlertDialogHeader>
+
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction

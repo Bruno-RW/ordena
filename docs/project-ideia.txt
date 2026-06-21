@@ -1,0 +1,56 @@
+Here is the English translation of the text, maintaining a clear and organized format:
+
+## **Themes for Interface Project**
+
+### **1. Intelligent Academic Organization Platform**
+
+#### **Problem**
+
+University students frequently face difficulties in organizing their courses, deadlines, independent studies, and extracurricular activities.
+
+#### **Proposal**
+
+Develop an integrated academic platform that allows for:
+
+* Schedule management;
+* Task organization;
+* Submission tracking;
+* Performance tracking;
+* Study planning;
+* Visualization of the weekly workload.
+
+#### **Features**
+
+**Dashboard**
+
+* View a summary of pending tasks and upcoming deadlines
+* View a weekly workload chart
+
+**Courses (Disciplines)**
+
+* List the semester's courses
+* Add a course (name, professor, schedule)
+* Edit and delete a course
+
+**Tasks**
+
+* List tasks with their status and deadline
+* Add a task linked to a specific course
+* Edit and delete a task
+* Mark a task as completed
+* Filter tasks by course and status
+
+**Calendar**
+
+* View deadlines and tasks in monthly and weekly formats
+
+**Performance**
+
+* Record grades by course
+* View the automatically calculated average
+* View a progress chart by course
+
+**Profile**
+
+* Edit user name and major/program
+* Toggle between light and dark themes

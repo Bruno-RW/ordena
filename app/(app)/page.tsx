@@ -3,50 +3,46 @@
 import {
   IconAlertCircle,
   IconBookmark,
-  IconCalendarEvent,
   IconCheck,
   IconChevronRight,
   IconClock,
   IconListCheck,
   IconSchool,
 } from "@tabler/icons-react";
-import Link from "next/link";
+
 import { useEffect, useMemo, useState } from "react";
 
-import { PageHeader } from "@/components/page-header";
+import Link from "next/link";
+
+import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
-import { useStore } from "@/context/store";
-import type { Disciplina } from "@/data/mock";
+import { useData } from "@/hooks/useData";
 import { cn } from "@/lib/utils";
+import { Subject } from "@/types/subject";
+import { StatusEnum } from "@/types/task";
 
-function statusLabel(status: string) {
-  if (status === "concluida") return "Concluída";
-  if (status === "em_andamento") return "Em andamento";
+function statusLabel(status: StatusEnum) {
+  if (status === StatusEnum.COMPLETED) return "Concluída";
+  if (status === StatusEnum.IN_PROGRESS) return "Em andamento";
   return "Pendente";
 }
 
-function statusVariant(
-  status: string,
-): "default" | "secondary" | "outline" | "destructive" {
-  if (status === "concluida") return "default";
-  if (status === "em_andamento") return "secondary";
+function statusVariant(status: StatusEnum): "default" | "secondary" | "outline" | "destructive" {
+  if (status === StatusEnum.COMPLETED) return "default";
+  if (status === StatusEnum.IN_PROGRESS) return "secondary";
   return "outline";
 }
 
 function daysUntil(dateStr: string, today: Date) {
   const t = new Date(today);
   t.setHours(0, 0, 0, 0);
+
   const d = new Date(dateStr);
   d.setHours(0, 0, 0, 0);
+
   return Math.round((d.getTime() - t.getTime()) / 86400000);
 }
 
@@ -58,49 +54,50 @@ function formatDate(dateStr: string) {
 }
 
 export default function DashboardPage() {
-  const { disciplinas, tarefas, notas, perfil } = useStore();
+  const { subjects, tasks, scores, profile } = useData();
   const [today, setToday] = useState<Date | null>(null);
 
-  useEffect(() => {
-    setToday(new Date());
-  }, []);
+  useEffect(() => setToday(new Date()), []);
 
   const stats = useMemo(() => {
-    const total = tarefas.length;
-    const concluidas = tarefas.filter((t) => t.status === "concluida").length;
-    const pendentes = tarefas.filter((t) => t.status === "pendente").length;
-    const emAndamento = tarefas.filter(
-      (t) => t.status === "em_andamento",
-    ).length;
-    return { total, concluidas, pendentes, emAndamento };
-  }, [tarefas]);
+    const totalTasks = tasks.length;
+    const completedTasks = tasks.filter((t) => t.status === StatusEnum.COMPLETED).length;
+    const pendingTasks = tasks.filter((t) => t.status === StatusEnum.PENDING).length;
+    const inProgressTasks = tasks.filter((t) => t.status === StatusEnum.IN_PROGRESS).length;
 
-  const proximasTarefas = useMemo(() => {
-    return tarefas
-      .filter((t) => t.status !== "concluida")
-      .sort((a, b) => new Date(a.prazo).getTime() - new Date(b.prazo).getTime())
+    return {
+      totalTasks,
+      completedTasks,
+      pendingTasks,
+      inProgressTasks,
+    };
+  }, [tasks]);
+
+  const nextTasks = useMemo(() => {
+    return tasks
+      .filter((t) => t.status !== StatusEnum.COMPLETED)
+      .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
       .slice(0, 5);
-  }, [tarefas]);
+  }, [tasks]);
 
-  const mediaGeral = useMemo(() => {
-    if (notas.length === 0) return 0;
-    const totalPeso = notas.reduce((acc, n) => acc + n.peso, 0);
-    const soma = notas.reduce((acc, n) => acc + n.valor * n.peso, 0);
-    return totalPeso > 0 ? soma / totalPeso : 0;
-  }, [notas]);
+  const globalAverage = useMemo(() => {
+    if (scores.length === 0) return 0;
 
-  const disciplinaMap = useMemo(
-    () => Object.fromEntries(disciplinas.map((d) => [d.id, d])),
-    [disciplinas],
-  );
+    const totalWeight = scores.reduce((acc, n) => acc + n.weight, 0);
+    const sum = scores.reduce((acc, n) => acc + n.value * n.weight, 0);
 
-  const progressoPct =
-    stats.total > 0 ? Math.round((stats.concluidas / stats.total) * 100) : 0;
+    return totalWeight > 0 ? sum / totalWeight : 0;
+  }, [scores]);
+
+  const subjectMap = useMemo(() => Object.fromEntries(subjects.map((d) => [d.id, d])), [subjects]);
+
+  const progressPercentage =
+    stats.totalTasks > 0 ? Math.round((stats.completedTasks / stats.totalTasks) * 100) : 0;
 
   return (
     <div className="flex flex-col flex-1">
-      <PageHeader
-        title={`Olá, ${perfil.nome.split(" ")[0]}`}
+      <Header
+        title={`Olá, ${profile.name.split(" ")[0]}`}
         description="Veja um resumo da sua semana acadêmica"
       />
 
@@ -114,13 +111,10 @@ export default function DashboardPage() {
                 Disciplinas
               </CardDescription>
             </CardHeader>
+
             <CardContent>
-              <p className="text-3xl font-bold text-foreground">
-                {disciplinas.length}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                semestre atual
-              </p>
+              <p className="text-3xl font-bold text-foreground">{subjects.length}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">semestre atual</p>
             </CardContent>
           </Card>
 
@@ -131,13 +125,12 @@ export default function DashboardPage() {
                 Tarefas
               </CardDescription>
             </CardHeader>
+
             <CardContent>
               <p className="text-3xl font-bold text-foreground">
-                {stats.pendentes + stats.emAndamento}
+                {stats.pendingTasks + stats.inProgressTasks}
               </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                em aberto
-              </p>
+              <p className="text-xs text-muted-foreground mt-0.5">em aberto</p>
             </CardContent>
           </Card>
 
@@ -148,13 +141,10 @@ export default function DashboardPage() {
                 Concluídas
               </CardDescription>
             </CardHeader>
+
             <CardContent>
-              <p className="text-3xl font-bold text-foreground">
-                {stats.concluidas}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                de {stats.total} tarefas
-              </p>
+              <p className="text-3xl font-bold text-foreground">{stats.completedTasks}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">de {stats.totalTasks} tarefas</p>
             </CardContent>
           </Card>
 
@@ -165,107 +155,92 @@ export default function DashboardPage() {
                 Média geral
               </CardDescription>
             </CardHeader>
+
             <CardContent>
-              <p className="text-3xl font-bold text-foreground">
-                {mediaGeral.toFixed(1)}
-              </p>
-              <p className="text-xs text-muted-foreground mt-0.5">
-                de 10,0
-              </p>
+              <p className="text-3xl font-bold text-foreground">{globalAverage.toFixed(1)}</p>
+              <p className="text-xs text-muted-foreground mt-0.5">de 10,0</p>
             </CardContent>
           </Card>
         </div>
 
         <div className="grid gap-4 lg:grid-cols-3">
-          {/* Progresso geral */}
+          {/* General progress */}
           <Card className="lg:col-span-1">
             <CardHeader>
-              <CardTitle className="text-sm font-semibold">
-                Progresso do semestre
-              </CardTitle>
+              <CardTitle className="text-sm font-semibold">Progresso do semestre</CardTitle>
               <CardDescription>
-                {stats.concluidas} de {stats.total} tarefas concluídas
+                {stats.completedTasks} de {stats.totalTasks} tarefas concluídas
               </CardDescription>
             </CardHeader>
+
             <CardContent className="flex flex-col gap-4">
               <div className="flex flex-col gap-2">
                 <div className="flex justify-between text-xs">
                   <span className="text-muted-foreground">Progresso</span>
-                  <span className="font-semibold text-foreground">
-                    {progressoPct}%
-                  </span>
+                  <span className="font-semibold text-foreground">{progressPercentage}%</span>
                 </div>
-                <Progress value={progressoPct} className="h-2" />
+                <Progress value={progressPercentage} className="h-2" />
               </div>
+
               <Separator />
+
               <div className="flex flex-col gap-2">
                 {[
                   {
                     label: "Concluídas",
-                    count: stats.concluidas,
+                    count: stats.completedTasks,
                     color: "bg-primary",
                   },
                   {
                     label: "Em andamento",
-                    count: stats.emAndamento,
+                    count: stats.inProgressTasks,
                     color: "bg-chart-2",
                   },
                   {
                     label: "Pendentes",
-                    count: stats.pendentes,
+                    count: stats.pendingTasks,
                     color: "bg-muted-foreground",
                   },
                 ].map((item) => (
-                  <div
-                    key={item.label}
-                    className="flex items-center justify-between text-sm"
-                  >
+                  <div key={item.label} className="flex items-center justify-between text-sm">
                     <div className="flex items-center gap-2">
-                      <div
-                        className={cn("size-2.5 rounded-full", item.color)}
-                      />
-                      <span className="text-muted-foreground">
-                        {item.label}
-                      </span>
+                      <div className={cn("size-2.5 rounded-full", item.color)} />
+                      <span className="text-muted-foreground">{item.label}</span>
                     </div>
-                    <span className="font-medium text-foreground">
-                      {item.count}
-                    </span>
+                    <span className="font-medium text-foreground">{item.count}</span>
                   </div>
                 ))}
               </div>
             </CardContent>
           </Card>
 
-          {/* Próximas tarefas */}
+          {/* Próximas tasks */}
           <Card className="lg:col-span-2">
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle className="text-sm font-semibold">
-                  Próximas entregas
-                </CardTitle>
+                <CardTitle className="text-sm font-semibold">Próximas entregas</CardTitle>
                 <CardDescription>Tarefas mais urgentes</CardDescription>
               </div>
+
               <Link
-                href="/tarefas"
+                href="/tasks"
                 className="flex items-center gap-1 text-xs text-primary hover:underline"
               >
                 Ver todas
                 <IconChevronRight className="size-3" />
               </Link>
             </CardHeader>
+
             <CardContent className="flex flex-col gap-3">
-              {proximasTarefas.length === 0 ? (
+              {nextTasks.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-6 text-muted-foreground text-sm gap-2">
                   <IconCheck className="size-8 opacity-40" />
                   <span>Nenhuma tarefa pendente</span>
                 </div>
               ) : (
-                proximasTarefas.map((tarefa) => {
-                  const disc = disciplinaMap[tarefa.disciplinaId] as
-                    | Disciplina
-                    | undefined;
-                  const days = today ? daysUntil(tarefa.prazo, today) : null;
+                nextTasks.map((tarefa) => {
+                  const subject = subjectMap[tarefa.subjectId] as Subject | undefined;
+                  const days = today ? daysUntil(tarefa.deadline, today) : null;
                   const isUrgent = days !== null && days <= 2;
 
                   return (
@@ -275,15 +250,15 @@ export default function DashboardPage() {
                     >
                       <div className="flex flex-col gap-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">
-                          {tarefa.titulo}
+                          {tarefa.title}
                         </p>
                         <div className="flex items-center gap-2 flex-wrap">
-                          {disc && (
+                          {subject && (
                             <span
                               className="text-xs px-1.5 py-0.5 rounded-sm font-medium text-white"
-                              style={{ backgroundColor: disc.cor }}
+                              style={{ backgroundColor: subject.color }}
                             >
-                              {disc.nome}
+                              {subject.name}
                             </span>
                           )}
                           <Badge variant={statusVariant(tarefa.status)}>
@@ -294,9 +269,7 @@ export default function DashboardPage() {
                       <div
                         className={cn(
                           "flex items-center gap-1 text-xs shrink-0 font-medium",
-                          isUrgent
-                            ? "text-destructive"
-                            : "text-muted-foreground",
+                          isUrgent ? "text-destructive" : "text-muted-foreground"
                         )}
                       >
                         {isUrgent ? (
@@ -306,14 +279,14 @@ export default function DashboardPage() {
                         )}
                         <span>
                           {days === null
-                            ? formatDate(tarefa.prazo)
+                            ? formatDate(tarefa.deadline)
                             : days === 0
                               ? "Hoje"
                               : days === 1
                                 ? "Amanhã"
                                 : days < 0
                                   ? "Atrasada"
-                                  : formatDate(tarefa.prazo)}
+                                  : formatDate(tarefa.deadline)}
                         </span>
                       </div>
                     </div>
@@ -324,68 +297,56 @@ export default function DashboardPage() {
           </Card>
         </div>
 
-        {/* Disciplinas row */}
+        {/* Subjects row */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle className="text-sm font-semibold">
-                Disciplinas do semestre
-              </CardTitle>
-              <CardDescription>
-                {disciplinas.length} disciplinas matriculadas
-              </CardDescription>
+              <CardTitle className="text-sm font-semibold">Disciplinas do semestre</CardTitle>
+              <CardDescription>{subjects.length} disciplinas matriculadas</CardDescription>
             </div>
+
             <Link
-              href="/disciplinas"
+              href="/subjects"
               className="flex items-center gap-1 text-xs text-primary hover:underline"
             >
               Gerenciar
               <IconChevronRight className="size-3" />
             </Link>
           </CardHeader>
+
           <CardContent>
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              {disciplinas.map((d) => {
-                const minhasTarefas = tarefas.filter(
-                  (t) => t.disciplinaId === d.id,
-                );
-                const minhasConcluidas = minhasTarefas.filter(
-                  (t) => t.status === "concluida",
+              {subjects.map((s) => {
+                const myTasks = tasks.filter((t) => t.subjectId === s.id);
+                const myCompletedTasks = myTasks.filter(
+                  (t) => t.status === StatusEnum.COMPLETED
                 ).length;
-                const pct =
-                  minhasTarefas.length > 0
-                    ? Math.round(
-                        (minhasConcluidas / minhasTarefas.length) * 100,
-                      )
-                    : 0;
+                const percentage =
+                  myTasks.length > 0 ? Math.round((myCompletedTasks / myTasks.length) * 100) : 0;
 
                 return (
                   <div
-                    key={d.id}
+                    key={s.id}
                     className="flex flex-col gap-2 rounded-lg border border-border p-3"
                   >
                     <div className="flex items-center gap-2">
                       <div
                         className="size-3 rounded-full shrink-0"
-                        style={{ backgroundColor: d.cor }}
+                        style={{ backgroundColor: s.color }}
                       />
-                      <p className="text-sm font-medium text-foreground truncate">
-                        {d.nome}
-                      </p>
+                      <p className="text-sm font-medium text-foreground truncate">{s.name}</p>
                     </div>
-                    <p className="text-xs text-muted-foreground">
-                      {d.professor}
-                    </p>
+
+                    <p className="text-xs text-muted-foreground">{s.professor}</p>
+
                     <div className="flex flex-col gap-1">
                       <div className="flex justify-between text-xs">
                         <span className="text-muted-foreground">
-                          {minhasConcluidas}/{minhasTarefas.length} tarefas
+                          {myCompletedTasks}/{myTasks.length} tasks
                         </span>
-                        <span className="font-medium text-foreground">
-                          {pct}%
-                        </span>
+                        <span className="font-medium text-foreground">{percentage}%</span>
                       </div>
-                      <Progress value={pct} className="h-1.5" />
+                      <Progress value={percentage} className="h-1.5" />
                     </div>
                   </div>
                 );
