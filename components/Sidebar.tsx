@@ -13,10 +13,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { useData } from "@/hooks/useData";
-import { StatusEnum } from "@/types/task";
-
-import { Avatar, AvatarFallback } from "./ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   SidebarContent,
   SidebarFooter,
@@ -29,7 +26,9 @@ import {
   SidebarMenuItem,
   SidebarRail,
   Sidebar as UISidebar,
-} from "./ui/sidebar";
+} from "@/components/ui/sidebar";
+import { useData } from "@/hooks/useData";
+import { StatusEnum } from "@/types/task";
 
 const navItems = [
   { href: "/", label: "Relatório", icon: IconHome },
@@ -55,7 +54,7 @@ const Sidebar = () => {
               <div className="flex size-8 items-center justify-center rounded-lg bg-primary">
                 <IconLayoutSidebar className="size-4 text-primary-foreground" />
               </div>
-              <div className="flex flex-col gap-0.5 leading-none">
+              <div className="flex flex-col gap-0.5 leading-none group-data-[collapsible=icon]:hidden">
                 <span className="font-semibold text-sidebar-foreground">Ordena</span>
                 <span className="text-xs text-muted-foreground">{profile.course}</span>
               </div>
@@ -101,7 +100,7 @@ const Sidebar = () => {
                   {profile.avatarInitials}
                 </AvatarFallback>
               </Avatar>
-              <div className="flex flex-col gap-0.5 leading-none text-sm">
+              <div className="flex flex-col gap-0.5 leading-none text-sm group-data-[collapsible=icon]:hidden">
                 <span className="font-medium text-sidebar-foreground">{profile.name}</span>
                 <span className="text-xs text-muted-foreground">{profile.semester}º semestre</span>
               </div>

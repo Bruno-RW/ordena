@@ -4,8 +4,9 @@ import {
   IconAlertCircle,
   IconBookmark,
   IconCheck,
-  IconChevronRight,
   IconClock,
+  IconEdit,
+  IconEye,
   IconListCheck,
   IconSchool,
 } from "@tabler/icons-react";
@@ -16,6 +17,7 @@ import Link from "next/link";
 
 import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -222,12 +224,11 @@ export default function DashboardPage() {
                 <CardDescription>Tarefas mais urgentes</CardDescription>
               </div>
 
-              <Link
-                href="/tasks"
-                className="flex items-center gap-1 text-xs text-primary hover:underline"
-              >
-                Ver todas
-                <IconChevronRight className="size-3" />
+              <Link href="/tasks">
+                <Button>
+                  <IconEye />
+                  Ver todas
+                </Button>
               </Link>
             </CardHeader>
 
@@ -305,12 +306,11 @@ export default function DashboardPage() {
               <CardDescription>{subjects.length} disciplinas matriculadas</CardDescription>
             </div>
 
-            <Link
-              href="/subjects"
-              className="flex items-center gap-1 text-xs text-primary hover:underline"
-            >
-              Gerenciar
-              <IconChevronRight className="size-3" />
+            <Link href="/subjects">
+              <Button>
+                <IconEdit />
+                Gerenciar
+              </Button>
             </Link>
           </CardHeader>
 

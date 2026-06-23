@@ -1,6 +1,5 @@
 import { FC } from "react";
 
-import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 
@@ -17,7 +16,6 @@ const Header: FC<HeaderProps> = ({ title, description, children, className }) =>
       className={cn("flex h-14 shrink-0 items-center gap-3 border-b border-border px-4", className)}
     >
       <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="h-4" />
 
       <div className="flex flex-1 items-center justify-between gap-4">
         <div>

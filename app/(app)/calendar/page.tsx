@@ -101,10 +101,12 @@ export default function CalendarPage() {
               <CardTitle className="text-base">
                 {MONTHS[month]} {year}
               </CardTitle>
+
               <div className="flex gap-1">
                 <Button variant="outline" size="icon" className="size-7" onClick={prevMonth}>
                   <IconChevronLeft className="size-4" />
                 </Button>
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -117,12 +119,14 @@ export default function CalendarPage() {
                 >
                   Hoje
                 </Button>
+
                 <Button variant="outline" size="icon" className="size-7" onClick={nextMonth}>
                   <IconChevronRight className="size-4" />
                 </Button>
               </div>
             </div>
           </CardHeader>
+
           <CardContent>
             {/* Header row */}
             <div className="grid grid-cols-7 mb-1">
@@ -132,6 +136,7 @@ export default function CalendarPage() {
                 </div>
               ))}
             </div>
+
             {/* Days grid */}
             <div className="grid grid-cols-7 gap-y-1">
               {calDays.map((day, idx) => {
