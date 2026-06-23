@@ -6,8 +6,8 @@ import Header from "@/components/Header";
 import { useData } from "@/hooks/useData";
 import { StatusEnum } from "@/types/task";
 
-import { CalendarGrid } from "./calendar-grid";
-import { UpcomingSidebar } from "./upcoming-sidebar";
+import { CalendarGrid } from "./_components/CalendarGrid";
+import { UpcomingSidebar } from "./_components/UpcomingSidebar";
 
 function isoDate(year: number, month: number, day: number) {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
@@ -42,10 +42,7 @@ export default function CalendarPage() {
     return days;
   }, [year, month]);
 
-  const subjectMap = useMemo(
-    () => Object.fromEntries(subjects.map((d) => [d.id, d])),
-    [subjects]
-  );
+  const subjectMap = useMemo(() => Object.fromEntries(subjects.map((d) => [d.id, d])), [subjects]);
 
   const tasksByDate = useMemo(() => {
     const map: Record<string, typeof tasks> = {};

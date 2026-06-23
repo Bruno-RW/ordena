@@ -43,14 +43,13 @@ export function UpcomingSidebar({
         ) : (
           upcoming.map((task) => {
             const subject = subjectMap[task.subjectId];
-            const days =
-              todayStr
-                ? Math.round(
-                    (new Date(task.deadline + "T00:00:00").getTime() -
-                      new Date(todayStr + "T00:00:00").getTime()) /
-                      86400000
-                  )
-                : null;
+            const days = todayStr
+              ? Math.round(
+                  (new Date(task.deadline + "T00:00:00").getTime() -
+                    new Date(todayStr + "T00:00:00").getTime()) /
+                    86400000
+                )
+              : null;
 
             return (
               <button

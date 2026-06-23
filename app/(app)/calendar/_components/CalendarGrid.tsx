@@ -2,7 +2,7 @@
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
-import { MONTHS, WEEK_DAYS } from "@/app/(app)/calendar/constants";
+import { MONTHS, WEEK_DAYS } from "@/app/(app)/calendar/_lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,7 +116,9 @@ export function CalendarGrid({
                           key={t.id}
                           className="size-1.5 rounded-full"
                           style={{
-                            backgroundColor: isSelected ? "white" : (subject?.color ?? "currentColor"),
+                            backgroundColor: isSelected
+                              ? "white"
+                              : (subject?.color ?? "currentColor"),
                           }}
                         />
                       );

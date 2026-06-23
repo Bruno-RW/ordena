@@ -35,13 +35,9 @@ export function SubjectsGrid({ subjects, tasks }: SubjectsGridProps) {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {subjects.map((subject) => {
             const subjectTasks = tasks.filter((t) => t.subjectId === subject.id);
-            const completed = subjectTasks.filter(
-              (t) => t.status === StatusEnum.COMPLETED
-            ).length;
+            const completed = subjectTasks.filter((t) => t.status === StatusEnum.COMPLETED).length;
             const percentage =
-              subjectTasks.length > 0
-                ? Math.round((completed / subjectTasks.length) * 100)
-                : 0;
+              subjectTasks.length > 0 ? Math.round((completed / subjectTasks.length) * 100) : 0;
 
             return (
               <div

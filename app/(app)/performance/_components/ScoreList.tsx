@@ -123,7 +123,12 @@ export function ScoreList({
                     >
                       <span className="flex-1 text-sm text-foreground">{score.description}</span>
                       <span className="text-xs text-muted-foreground">Peso {score.weight}</span>
-                      <span className={cn("text-base font-bold w-10 text-right", mediaColor(score.value))}>
+                      <span
+                        className={cn(
+                          "text-base font-bold w-10 text-right",
+                          mediaColor(score.value)
+                        )}
+                      >
                         {score.value.toFixed(1)}
                       </span>
                       <div className="flex gap-1">

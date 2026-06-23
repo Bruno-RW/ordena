@@ -13,10 +13,10 @@ import { useData } from "@/hooks/useData";
 import { cn } from "@/lib/utils";
 import { Score } from "@/types/score";
 
-import { PerformanceChart } from "./performance-chart";
-import { ScoreDeleteDialog } from "./score-delete-dialog";
-import { ScoreDialog, ScoreFormData } from "./score-dialog";
-import { ScoreList } from "./score-list";
+import { PerformanceChart } from "./_components/PerformanceChart";
+import { ScoreDeleteDialog } from "./_components/ScoreDeleteDialog";
+import { ScoreDialog, ScoreFormData } from "./_components/ScoreDialog";
+import { ScoreList } from "./_components/ScoreList";
 
 const emptyForm: ScoreFormData = {
   subjectId: "",

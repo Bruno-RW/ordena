@@ -6,10 +6,10 @@ import Header from "@/components/Header";
 import { useData } from "@/hooks/useData";
 import { StatusEnum } from "@/types/task";
 
-import { DashboardStats } from "./_components/dashboard-stats";
-import { SemesterProgress } from "./_components/semester-progress";
-import { SubjectsGrid } from "./_components/subjects-grid";
-import { UpcomingTasks } from "./_components/upcoming-tasks";
+import { DashboardStats } from "./_components/DashboardStats";
+import { SemesterProgress } from "./_components/SemesterProgress";
+import { SubjectsGrid } from "./_components/SubjectsGrid";
+import { UpcomingTasks } from "./_components/UpcomingTasks";
 
 export default function DashboardPage() {
   const { subjects, tasks, scores, profile } = useData();
@@ -21,7 +21,13 @@ export default function DashboardPage() {
     const completedTasks = tasks.filter((t) => t.status === StatusEnum.COMPLETED).length;
     const pendingTasks = tasks.filter((t) => t.status === StatusEnum.PENDING).length;
     const inProgressTasks = tasks.filter((t) => t.status === StatusEnum.IN_PROGRESS).length;
-    return { completedTasks, pendingTasks, inProgressTasks, totalTasks: tasks.length };
+
+    return {
+      completedTasks,
+      pendingTasks,
+      inProgressTasks,
+      totalTasks: tasks.length,
+    };
   }, [tasks]);
 
   const nextTasks = useMemo(() => {
@@ -33,15 +39,14 @@ export default function DashboardPage() {
 
   const globalAverage = useMemo(() => {
     if (scores.length === 0) return 0;
+
     const totalWeight = scores.reduce((acc, n) => acc + n.weight, 0);
     const sum = scores.reduce((acc, n) => acc + n.value * n.weight, 0);
+
     return totalWeight > 0 ? sum / totalWeight : 0;
   }, [scores]);
 
-  const subjectMap = useMemo(
-    () => Object.fromEntries(subjects.map((d) => [d.id, d])),
-    [subjects]
-  );
+  const subjectMap = useMemo(() => Object.fromEntries(subjects.map((d) => [d.id, d])), [subjects]);
 
   return (
     <div className="flex flex-col flex-1">

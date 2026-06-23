@@ -74,7 +74,7 @@ export default function PerfilPage() {
     <div className="flex flex-col flex-1">
       <Header title="Perfil" description="Configurações da conta" />
 
-      <main className="flex-1 p-4 md:p-6 flex flex-col gap-6 max-w-2xl">
+      <main className="flex-1 p-4 md:p-6 flex flex-col gap-6">
         {/* Profile Card */}
         <Card>
           <CardContent className="pt-6">

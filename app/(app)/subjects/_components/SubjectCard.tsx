@@ -41,12 +41,7 @@ export function SubjectCard({ subject, tasks, scores, onEdit, onDelete }: Subjec
             <CardTitle className="text-base leading-snug">{subject.name}</CardTitle>
           </div>
           <div className="flex gap-1 shrink-0">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-7"
-              onClick={() => onEdit(subject)}
-            >
+            <Button variant="ghost" size="icon" className="size-7" onClick={() => onEdit(subject)}>
               <IconEdit className="size-3.5" />
             </Button>
             <Button

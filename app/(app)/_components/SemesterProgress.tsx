@@ -18,8 +18,7 @@ export function SemesterProgress({
   inProgressTasks,
   pendingTasks,
 }: SemesterProgressProps) {
-  const percentage =
-    totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+  const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const items = [
     { label: "Concluídas", count: completedTasks, color: "bg-primary" },

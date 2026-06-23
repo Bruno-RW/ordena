@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Subject } from "@/types/subject";
 
-import { COLOR_OPTIONS } from "./constants";
+import { COLOR_OPTIONS } from "../_lib/constants";
 
 export type SubjectFormData = Omit<Subject, "id">;
 

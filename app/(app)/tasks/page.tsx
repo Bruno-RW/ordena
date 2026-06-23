@@ -12,10 +12,10 @@ import { Button } from "@/components/ui/button";
 import { useData } from "@/hooks/useData";
 import { StatusEnum, Task } from "@/types/task";
 
-import { TaskDeleteDialog } from "./task-delete-dialog";
-import { TaskDialog, TaskFormData } from "./task-dialog";
-import { TaskFilters } from "./task-filters";
-import { TaskItem } from "./task-item";
+import { TaskDeleteDialog } from "./_components/TaskDeleteDialog";
+import { TaskDialog, TaskFormData } from "./_components/TaskDialog";
+import { TaskFilters } from "./_components/TaskFilters";
+import { TaskItem } from "./_components/TaskItem";
 
 const emptyForm: TaskFormData = {
   title: "",
@@ -38,10 +38,7 @@ export default function TasksPage() {
   const [editing, setEditing] = useState<Task | null>(null);
   const [form, setForm] = useState<TaskFormData>(emptyForm);
 
-  const subjectMap = useMemo(
-    () => Object.fromEntries(subjects.map((d) => [d.id, d])),
-    [subjects]
-  );
+  const subjectMap = useMemo(() => Object.fromEntries(subjects.map((d) => [d.id, d])), [subjects]);
 
   const filtered = useMemo(() => {
     return tasks
@@ -52,9 +49,21 @@ export default function TasksPage() {
 
   const groups = useMemo(() => {
     return [
-      { key: "pending", label: "Pendentes", items: filtered.filter((t) => t.status === StatusEnum.PENDING) },
-      { key: "in_progress", label: "Em andamento", items: filtered.filter((t) => t.status === StatusEnum.IN_PROGRESS) },
-      { key: "completed", label: "Concluídas", items: filtered.filter((t) => t.status === StatusEnum.COMPLETED) },
+      {
+        key: StatusEnum.PENDING,
+        label: "Pendentes",
+        items: filtered.filter((t) => t.status === StatusEnum.PENDING),
+      },
+      {
+        key: StatusEnum.IN_PROGRESS,
+        label: "Em andamento",
+        items: filtered.filter((t) => t.status === StatusEnum.IN_PROGRESS),
+      },
+      {
+        key: StatusEnum.COMPLETED,
+        label: "Concluídas",
+        items: filtered.filter((t) => t.status === StatusEnum.COMPLETED),
+      },
     ].filter((g) => g.items.length > 0 || filterStatus === "all");
   }, [filtered, filterStatus]);
 
@@ -81,10 +90,12 @@ export default function TasksPage() {
       toast.error("O título da tarefa é obrigatório.");
       return;
     }
+
     if (!form.deadline) {
       toast.error("O prazo é obrigatório.");
       return;
     }
+
     if (editing) {
       updateTask({ ...editing, ...form });
       toast.success("Tarefa atualizada.");
@@ -92,11 +103,13 @@ export default function TasksPage() {
       addTask(form);
       toast.success("Tarefa adicionada.");
     }
+
     setDialogOpen(false);
   }
 
   function handleDelete() {
     if (!deleteId) return;
+
     deleteTask(deleteId);
     toast.success("Tarefa removida.");
     setDeleteId(null);
@@ -118,7 +131,10 @@ export default function TasksPage() {
           filterStatus={filterStatus}
           onFilterSubjectChange={setFilterSubject}
           onFilterStatusChange={setFilterStatus}
-          onClear={() => { setFilterSubject("all"); setFilterStatus("all"); }}
+          onClear={() => {
+            setFilterSubject("all");
+            setFilterStatus("all");
+          }}
         />
 
         <div className="text-sm text-muted-foreground">
