@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
+import { mediaColor, subjectAverage } from "@/app/(app)/performance/_lib/utils";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
@@ -25,21 +26,7 @@ const emptyForm: ScoreFormData = {
   weight: 1,
 };
 
-function subjectAverage(scores: Score[]): number | null {
-  if (scores.length === 0) return null;
-  const totalWeight = scores.reduce((a, n) => a + n.weight, 0);
-  const sum = scores.reduce((a, n) => a + n.value * n.weight, 0);
-  return totalWeight > 0 ? sum / totalWeight : null;
-}
-
-function mediaColor(m: number | null): string {
-  if (m === null) return "text-muted-foreground";
-  if (m >= 7) return "text-emerald-600 dark:text-emerald-400";
-  if (m >= 5) return "text-amber-600 dark:text-amber-400";
-  return "text-destructive";
-}
-
-export default function PerformancePage() {
+const PerformancePage = () => {
   const { scores, subjects, addScore, updateScore, deleteScore } = useData();
 
   const [selectedSubject, setSelectedSubject] = useState("all");
@@ -207,4 +194,6 @@ export default function PerformancePage() {
       />
     </div>
   );
-}
+};
+
+export default PerformancePage;

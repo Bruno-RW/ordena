@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { useData } from "@/hooks/useData";
 import { StatusEnum } from "@/types/task";
 
-export default function PerfilPage() {
+const ProfilePage = () => {
   const { profile, updateProfile, subjects, tasks, scores } = useData();
   const { theme, setTheme } = useTheme();
 
@@ -202,4 +202,6 @@ export default function PerfilPage() {
       </main>
     </div>
   );
-}
+};
+
+export default ProfilePage;

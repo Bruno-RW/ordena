@@ -25,7 +25,7 @@ const emptyForm: TaskFormData = {
   description: "",
 };
 
-export default function TasksPage() {
+const TasksPage = () => {
   const { tasks, subjects, addTask, updateTask, deleteTask, toggleTask } = useData();
 
   const [today, setToday] = useState<Date | null>(null);
@@ -193,4 +193,6 @@ export default function TasksPage() {
       />
     </div>
   );
-}
+};
+
+export default TasksPage;

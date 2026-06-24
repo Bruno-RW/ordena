@@ -2,6 +2,8 @@
 
 import { IconEdit } from "@tabler/icons-react";
 
+import { FC } from "react";
+
 import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
@@ -15,7 +17,7 @@ interface SubjectsGridProps {
   tasks: Task[];
 }
 
-export function SubjectsGrid({ subjects, tasks }: SubjectsGridProps) {
+const SubjectsGrid: FC<SubjectsGridProps> = ({ subjects, tasks }) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
@@ -68,4 +70,6 @@ export function SubjectsGrid({ subjects, tasks }: SubjectsGridProps) {
       </CardContent>
     </Card>
   );
-}
+};
+
+export default SubjectsGrid;

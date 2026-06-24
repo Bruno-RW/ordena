@@ -6,12 +6,12 @@ import Header from "@/components/Header";
 import { useData } from "@/hooks/useData";
 import { StatusEnum } from "@/types/task";
 
-import { DashboardStats } from "./_components/DashboardStats";
-import { SemesterProgress } from "./_components/SemesterProgress";
-import { SubjectsGrid } from "./_components/SubjectsGrid";
-import { UpcomingTasks } from "./_components/UpcomingTasks";
+import DashboardStats from "./_components/DashboardStats";
+import SemesterProgress from "./_components/SemesterProgress";
+import SubjectsGrid from "./_components/SubjectsGrid";
+import UpcomingTasks from "./_components/UpcomingTasks";
 
-export default function DashboardPage() {
+const DashboardPage = () => {
   const { subjects, tasks, scores, profile } = useData();
   const [today, setToday] = useState<Date | null>(null);
 
@@ -79,4 +79,6 @@ export default function DashboardPage() {
       </main>
     </div>
   );
-}
+};
+
+export default DashboardPage;

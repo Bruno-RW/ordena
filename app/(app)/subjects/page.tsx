@@ -24,7 +24,7 @@ const emptyForm: SubjectFormData = {
   color: COLOR_OPTIONS[0],
 };
 
-export default function SubjectsPage() {
+const SubjectsPage = () => {
   const { subjects, tasks, scores, addSubject, updateSubject, deleteSubject } = useData();
 
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -123,4 +123,6 @@ export default function SubjectsPage() {
       />
     </div>
   );
-}
+};
+
+export default SubjectsPage;

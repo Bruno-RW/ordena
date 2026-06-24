@@ -1,5 +1,7 @@
 "use client";
 
+import { FC } from "react";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Separator } from "@/components/ui/separator";
@@ -12,12 +14,12 @@ interface SemesterProgressProps {
   pendingTasks: number;
 }
 
-export function SemesterProgress({
+const SemesterProgress: FC<SemesterProgressProps> = ({
   completedTasks,
   totalTasks,
   inProgressTasks,
   pendingTasks,
-}: SemesterProgressProps) {
+}) => {
   const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
   const items = [
@@ -60,4 +62,6 @@ export function SemesterProgress({
       </CardContent>
     </Card>
   );
-}
+};
+
+export default SemesterProgress;

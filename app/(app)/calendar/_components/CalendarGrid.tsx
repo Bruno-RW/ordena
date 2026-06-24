@@ -2,6 +2,8 @@
 
 import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 
+import { FC } from "react";
+
 import { MONTHS, WEEK_DAYS } from "@/app/(app)/calendar/_lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,7 +38,7 @@ function formatDatePT(dateStr: string) {
   });
 }
 
-export function CalendarGrid({
+const CalendarGrid: FC<CalendarGridProps> = ({
   year,
   month,
   calDays,
@@ -48,7 +50,7 @@ export function CalendarGrid({
   onPrevMonth,
   onNextMonth,
   onGoToToday,
-}: CalendarGridProps) {
+}) => {
   const selectedTasks = selected ? (tasksByDate[selected] ?? []) : [];
 
   return (
@@ -179,4 +181,6 @@ export function CalendarGrid({
       </CardContent>
     </Card>
   );
-}
+};
+
+export default CalendarGrid;

@@ -2,6 +2,8 @@
 
 import { IconCalendar, IconClock } from "@tabler/icons-react";
 
+import { FC } from "react";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Subject } from "@/types/subject";
 import { Task } from "@/types/task";
@@ -21,12 +23,12 @@ function formatDatePT(dateStr: string) {
   });
 }
 
-export function UpcomingSidebar({
+const UpcomingSidebar: FC<UpcomingSidebarProps> = ({
   upcoming,
   todayStr,
   subjectMap,
   onSelectTask,
-}: UpcomingSidebarProps) {
+}) => {
   return (
     <Card className="w-full lg:w-72 shrink-0">
       <CardHeader>
@@ -85,4 +87,6 @@ export function UpcomingSidebar({
       </CardContent>
     </Card>
   );
-}
+};
+
+export default UpcomingSidebar;

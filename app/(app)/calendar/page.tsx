@@ -6,14 +6,10 @@ import Header from "@/components/Header";
 import { useData } from "@/hooks/useData";
 import { StatusEnum } from "@/types/task";
 
-import { CalendarGrid } from "./_components/CalendarGrid";
-import { UpcomingSidebar } from "./_components/UpcomingSidebar";
+import CalendarGrid from "./_components/CalendarGrid";
+import UpcomingSidebar from "./_components/UpcomingSidebar";
 
-function isoDate(year: number, month: number, day: number) {
-  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
-
-export default function CalendarPage() {
+const CalendarPage = () => {
   const { tasks, subjects } = useData();
 
   const defaultDate = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
@@ -101,4 +97,6 @@ export default function CalendarPage() {
       </main>
     </div>
   );
-}
+};
+
+export default CalendarPage;

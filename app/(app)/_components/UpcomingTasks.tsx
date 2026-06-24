@@ -2,6 +2,8 @@
 
 import { IconAlertCircle, IconCheck, IconClock, IconEye } from "@tabler/icons-react";
 
+import { FC } from "react";
+
 import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
@@ -33,7 +35,7 @@ interface UpcomingTasksProps {
   today: Date | null;
 }
 
-export function UpcomingTasks({ tasks, subjectMap, today }: UpcomingTasksProps) {
+const UpcomingTasks: FC<UpcomingTasksProps> = ({ tasks, subjectMap, today }) => {
   return (
     <Card className="lg:col-span-2">
       <CardHeader className="flex flex-row items-center justify-between">
@@ -118,4 +120,6 @@ export function UpcomingTasks({ tasks, subjectMap, today }: UpcomingTasksProps) 
       </CardContent>
     </Card>
   );
-}
+};
+
+export default UpcomingTasks;
