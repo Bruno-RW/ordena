@@ -36,7 +36,6 @@ const navItems = [
   { href: "/tasks", label: "Tarefas", icon: IconListCheck },
   { href: "/calendar", label: "Calendário", icon: IconCalendar },
   { href: "/performance", label: "Performance", icon: IconChartBar },
-  { href: "/profile", label: "Perfil", icon: IconUser },
 ];
 
 const Sidebar = () => {
