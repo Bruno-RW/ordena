@@ -5,16 +5,13 @@ import { IconChevronLeft, IconChevronRight } from "@tabler/icons-react";
 import { FC } from "react";
 
 import { MONTHS, WEEK_DAYS } from "@/app/(app)/calendar/_lib/constants";
+import { formatDatePT, isoDate } from "@/app/(app)/calendar/_lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { Subject } from "@/types/subject";
 import { StatusEnum, Task } from "@/types/task";
-
-function isoDate(year: number, month: number, day: number) {
-  return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-}
 
 interface CalendarGridProps {
   year: number;
@@ -28,14 +25,6 @@ interface CalendarGridProps {
   onPrevMonth: () => void;
   onNextMonth: () => void;
   onGoToToday: () => void;
-}
-
-function formatDatePT(dateStr: string) {
-  return new Date(dateStr + "T00:00:00").toLocaleDateString("pt-BR", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-  });
 }
 
 const CalendarGrid: FC<CalendarGridProps> = ({

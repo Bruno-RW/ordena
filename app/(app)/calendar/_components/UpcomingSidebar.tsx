@@ -4,6 +4,7 @@ import { IconCalendar, IconClock } from "@tabler/icons-react";
 
 import { FC } from "react";
 
+import { formatDatePT } from "@/app/(app)/calendar/_lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Subject } from "@/types/subject";
 import { Task } from "@/types/task";
@@ -13,14 +14,6 @@ interface UpcomingSidebarProps {
   todayStr: string | null;
   subjectMap: Record<string, Subject>;
   onSelectTask: (deadline: string) => void;
-}
-
-function formatDatePT(dateStr: string) {
-  return new Date(dateStr + "T00:00:00").toLocaleDateString("pt-BR", {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-  });
 }
 
 const UpcomingSidebar: FC<UpcomingSidebarProps> = ({

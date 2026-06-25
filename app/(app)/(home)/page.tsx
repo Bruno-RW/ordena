@@ -2,14 +2,13 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import DashboardStats from "@/app/(app)/(home)/_components/DashboardStats";
+import SemesterProgress from "@/app/(app)/(home)/_components/SemesterProgress";
+import SubjectsGrid from "@/app/(app)/(home)/_components/SubjectsGrid";
+import UpcomingTasks from "@/app/(app)/(home)/_components/UpcomingTasks";
 import Header from "@/components/Header";
 import { useData } from "@/hooks/useData";
 import { StatusEnum } from "@/types/task";
-
-import DashboardStats from "./_components/DashboardStats";
-import SemesterProgress from "./_components/SemesterProgress";
-import SubjectsGrid from "./_components/SubjectsGrid";
-import UpcomingTasks from "./_components/UpcomingTasks";
 
 const DashboardPage = () => {
   const { subjects, tasks, scores, profile } = useData();

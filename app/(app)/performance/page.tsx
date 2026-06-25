@@ -6,6 +6,10 @@ import { useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
+import { PerformanceChart } from "@/app/(app)/performance/_components/PerformanceChart";
+import { ScoreDeleteDialog } from "@/app/(app)/performance/_components/ScoreDeleteDialog";
+import { ScoreDialog, ScoreFormData } from "@/app/(app)/performance/_components/ScoreDialog";
+import { ScoreList } from "@/app/(app)/performance/_components/ScoreList";
 import { mediaColor, subjectAverage } from "@/app/(app)/performance/_lib/utils";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
@@ -13,11 +17,6 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 import { useData } from "@/hooks/useData";
 import { cn } from "@/lib/utils";
 import { Score } from "@/types/score";
-
-import { PerformanceChart } from "./_components/PerformanceChart";
-import { ScoreDeleteDialog } from "./_components/ScoreDeleteDialog";
-import { ScoreDialog, ScoreFormData } from "./_components/ScoreDialog";
-import { ScoreList } from "./_components/ScoreList";
 
 const emptyForm: ScoreFormData = {
   subjectId: "",

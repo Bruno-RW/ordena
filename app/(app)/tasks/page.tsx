@@ -6,16 +6,15 @@ import { useEffect, useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
+import { TaskDeleteDialog } from "@/app/(app)/tasks/_components/TaskDeleteDialog";
+import { TaskDialog, TaskFormData } from "@/app/(app)/tasks/_components/TaskDialog";
+import { TaskFilters } from "@/app/(app)/tasks/_components/TaskFilters";
+import { TaskItem } from "@/app/(app)/tasks/_components/TaskItem";
 import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { useData } from "@/hooks/useData";
 import { StatusEnum, Task } from "@/types/task";
-
-import { TaskDeleteDialog } from "./_components/TaskDeleteDialog";
-import { TaskDialog, TaskFormData } from "./_components/TaskDialog";
-import { TaskFilters } from "./_components/TaskFilters";
-import { TaskItem } from "./_components/TaskItem";
 
 const emptyForm: TaskFormData = {
   title: "",

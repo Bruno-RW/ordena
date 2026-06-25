@@ -6,15 +6,14 @@ import { useState } from "react";
 
 import { toast } from "sonner";
 
+import { SubjectCard } from "@/app/(app)/subjects/_components/SubjectCard";
+import { SubjectDeleteDialog } from "@/app/(app)/subjects/_components/SubjectDeleteDialog";
+import { SubjectDialog, SubjectFormData } from "@/app/(app)/subjects/_components/SubjectDialog";
 import { COLOR_OPTIONS } from "@/app/(app)/subjects/_lib/constants";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { useData } from "@/hooks/useData";
 import { Subject } from "@/types/subject";
-
-import { SubjectCard } from "./_components/SubjectCard";
-import { SubjectDeleteDialog } from "./_components/SubjectDeleteDialog";
-import { SubjectDialog, SubjectFormData } from "./_components/SubjectDialog";
 
 const emptyForm: SubjectFormData = {
   name: "",
