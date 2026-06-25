@@ -1,6 +1,6 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -35,15 +35,19 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
         <CardDescription>Visualização do desempenho semestral</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
-          <BarChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
+        <ChartContainer config={chartConfig} className="min-h-[240px] w-full">
+          <BarChart
+            data={data}
+            margin={{ top: 24, right: 8, left: -20, bottom: 48 }}
+          >
             <CartesianGrid vertical={false} />
             <XAxis
               dataKey="name"
               tickLine={false}
               axisLine={false}
-              tick={{ fontSize: 11 }}
+              tick={false}
               tickMargin={8}
+              label={undefined}
             />
             <YAxis
               domain={[0, 10]}
@@ -67,6 +71,21 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
               {data.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
               ))}
+              <LabelList
+                dataKey="average"
+                position="top"
+                formatter={(v: number) => v.toFixed(1)}
+                style={{ fontSize: 11, fontWeight: 600, fill: "hsl(var(--foreground))" }}
+              />
+              <LabelList
+                dataKey="name"
+                position="bottom"
+                offset={12}
+                style={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                formatter={(v: string) =>
+                  v.length > 12 ? v.slice(0, 12) + "…" : v
+                }
+              />
             </Bar>
           </BarChart>
         </ChartContainer>
