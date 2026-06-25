@@ -1,17 +1,14 @@
 "use client";
 
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, Cell, XAxis, YAxis } from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 
 interface ChartEntry {
   name: string;
@@ -26,6 +23,11 @@ interface PerformanceChartProps {
 export function PerformanceChart({ data }: PerformanceChartProps) {
   if (data.length === 0) return null;
 
+  const chartConfig = data.reduce<ChartConfig>((acc, entry) => {
+    acc[entry.name] = { label: entry.name, color: entry.color };
+    return acc;
+  }, {});
+
   return (
     <Card>
       <CardHeader>
@@ -33,22 +35,33 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
         <CardDescription>Visualização do desempenho semestral</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={200}>
+        <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
           <BarChart data={data} margin={{ top: 4, right: 8, left: -20, bottom: 0 }}>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="hsl(var(--border) / 0.5)"
-              vertical={false}
+            <CartesianGrid vertical={false} />
+            <XAxis
+              dataKey="name"
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 11 }}
+              tickMargin={8}
             />
-            <XAxis dataKey="name" tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-            <YAxis domain={[0, 10]} tick={{ fontSize: 11 }} axisLine={false} tickLine={false} />
-            <Tooltip
-              contentStyle={{
-                borderRadius: "8px",
-                border: "1px solid hsl(var(--border))",
-                fontSize: "12px",
-              }}
-              formatter={(v) => [typeof v === "number" ? v.toFixed(1) : v, "Média"]}
+            <YAxis
+              domain={[0, 10]}
+              tickLine={false}
+              axisLine={false}
+              tick={{ fontSize: 11 }}
+              tickCount={6}
+            />
+            <ChartTooltip
+              content={
+                <ChartTooltipContent
+                  formatter={(value) => [
+                    typeof value === "number" ? value.toFixed(1) : value,
+                    "Média",
+                  ]}
+                  hideLabel
+                />
+              }
             />
             <Bar dataKey="average" radius={[4, 4, 0, 0]}>
               {data.map((entry, index) => (
@@ -56,7 +69,7 @@ export function PerformanceChart({ data }: PerformanceChartProps) {
               ))}
             </Bar>
           </BarChart>
-        </ResponsiveContainer>
+        </ChartContainer>
       </CardContent>
     </Card>
   );
