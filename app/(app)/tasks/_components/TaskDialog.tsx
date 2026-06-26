@@ -69,8 +69,13 @@ export function TaskDialog({
                 value={form.subjectId}
                 onValueChange={(v) => onFormChange({ ...form, subjectId: v ?? "" })}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecionar..." />
+                <SelectTrigger className="w-full">
+                  <SelectValue>
+                    {form.subjectId
+                      ? (subjects.find((subject) => subject.id === form.subjectId)?.name ??
+                        form.subjectId)
+                      : "Selecionar..."}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {subjects.map((d) => (
@@ -101,8 +106,16 @@ export function TaskDialog({
                 onFormChange({ ...form, status: (v ?? StatusEnum.PENDING) as StatusEnum })
               }
             >
-              <SelectTrigger>
-                <SelectValue />
+              <SelectTrigger className="w-full">
+                <SelectValue>
+                  {form.status === StatusEnum.PENDING
+                    ? "Pendente"
+                    : form.status === StatusEnum.IN_PROGRESS
+                      ? "Em andamento"
+                      : form.status === StatusEnum.COMPLETED
+                        ? "Concluída"
+                        : "Selecionar..."}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value={StatusEnum.PENDING}>Pendente</SelectItem>
@@ -120,6 +133,25 @@ export function TaskDialog({
               onChange={(e) => onFormChange({ ...form, description: e.target.value })}
               placeholder="Detalhes opcionais..."
               rows={3}
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="task-note">Nota</Label>
+            <Input
+              id="task-note"
+              type="number"
+              step="0.1"
+              min="0"
+              max="10"
+              value={form.note ?? ""}
+              onChange={(e) =>
+                onFormChange({
+                  ...form,
+                  note: e.target.value ? Number(e.target.value) : undefined,
+                })
+              }
+              placeholder="Ex: 8.5"
             />
           </div>
         </div>

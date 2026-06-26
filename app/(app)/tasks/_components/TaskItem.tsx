@@ -64,6 +64,11 @@ export function TaskItem({ task, subject, today, onToggle, onEdit, onDelete }: T
         >
           {task.title}
         </span>
+        {task.note !== undefined && (
+          <span className="text-xs text-muted-foreground">
+            Nota: {task.note % 1 === 0 ? task.note : task.note.toFixed(1)}
+          </span>
+        )}
         {subject && (
           <span
             className="text-xs px-1.5 py-0.5 rounded-sm font-medium text-white shrink-0"

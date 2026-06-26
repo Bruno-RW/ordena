@@ -22,6 +22,7 @@ const emptyForm: TaskFormData = {
   deadline: "",
   status: StatusEnum.PENDING,
   description: "",
+  note: undefined,
 };
 
 const TasksPage = () => {
@@ -80,6 +81,7 @@ const TasksPage = () => {
       deadline: task.deadline,
       status: task.status,
       description: task.description ?? "",
+      note: task.note,
     });
     setDialogOpen(true);
   }
