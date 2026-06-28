@@ -41,6 +41,7 @@ const TaskItem: FC<TaskItemProps> = ({ task, subject, today, onToggle, onEdit, o
         task.status === StatusEnum.COMPLETED && "opacity-60"
       )}
     >
+      {/* Left */}
       <button
         type="button"
         onClick={() => onToggle(task.id)}
@@ -66,11 +67,18 @@ const TaskItem: FC<TaskItemProps> = ({ task, subject, today, onToggle, onEdit, o
         >
           {task.title}
         </span>
+
         {task.score !== undefined && (
           <span className="text-xs font-semibold text-foreground shrink-0">
-            Nota: {task.score % 1 === 0 ? task.score : task.score.toFixed(1)}
+            Nota: {task.score.toFixed(1)}/10
+            {task.weight && task.weight > 1 ? (
+              <span className="ml-1 text-muted-foreground">
+                ({((task.score * task.weight) / 10).toFixed(2)})
+              </span>
+            ) : null}
           </span>
         )}
+
         {subject && (
           <span
             className="text-xs px-1.5 py-0.5 rounded-sm font-medium text-white shrink-0"
@@ -79,9 +87,11 @@ const TaskItem: FC<TaskItemProps> = ({ task, subject, today, onToggle, onEdit, o
             {subject.name}
           </span>
         )}
+
         <Badge variant={STATUS_VARIANTS[task.status]}>{STATUS_LABELS[task.status]}</Badge>
       </div>
 
+      {/* Right */}
       <span
         className={cn(
           "text-xs shrink-0 font-medium",

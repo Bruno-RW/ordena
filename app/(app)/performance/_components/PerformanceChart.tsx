@@ -1,6 +1,18 @@
 "use client";
 
-import { Bar, BarChart, CartesianGrid, Cell, LabelList, XAxis, YAxis } from "recharts";
+import { FC } from "react";
+
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -36,9 +48,10 @@ const PerformanceChart: FC<PerformanceChartProps> = ({ data }) => {
       </CardHeader>
 
       <CardContent>
-        <ChartContainer config={chartConfig} className="min-h-[240px] w-full">
-          <BarChart data={data} margin={{ top: 24, right: 8, left: -20, bottom: 48 }}>
-            <CartesianGrid vertical={false} />
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data} margin={{ top: 16, right: 8, left: 0, bottom: 32 }}>
+            <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+
             <XAxis
               dataKey="name"
               tickLine={false}
@@ -70,18 +83,12 @@ const PerformanceChart: FC<PerformanceChartProps> = ({ data }) => {
               {data.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
               ))}
+
               <LabelList
                 dataKey="average"
                 position="top"
-                formatter={(v: number) => v.toFixed(1)}
-                style={{ fontSize: 11, fontWeight: 600, fill: "hsl(var(--foreground))" }}
-              />
-              <LabelList
-                dataKey="name"
-                position="bottom"
-                offset={12}
-                style={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
-                formatter={(v: string) => (v.length > 12 ? v.slice(0, 12) + "…" : v)}
+                formatter={(v) => (typeof v === "number" ? v.toFixed(1) : String(v))}
+                style={{ fontSize: 12, fontWeight: 500 }}
               />
             </Bar>
           </BarChart>

@@ -1,9 +1,10 @@
 "use client";
 
-import { IconFilter } from "@tabler/icons-react";
+import { IconFilter, IconFilterOff } from "@tabler/icons-react";
 
 import { FC } from "react";
 
+import { STATUS_OPTIONS, statusLabel } from "@/app/(app)/tasks/_lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -18,10 +19,10 @@ import { StatusEnum } from "@/types/task";
 
 interface TaskFiltersProps {
   subjects: Subject[];
-  filterSubject: string;
-  filterStatus: string;
-  onFilterSubjectChange: (value: string) => void;
-  onFilterStatusChange: (value: string) => void;
+  filterSubject: "all" | string;
+  filterStatus: "all" | StatusEnum;
+  onFilterSubjectChange: (value: "all" | string) => void;
+  onFilterStatusChange: (value: "all" | StatusEnum) => void;
   onClear: () => void;
 }
 
@@ -43,7 +44,10 @@ const TaskFilters: FC<TaskFiltersProps> = ({
           <span className="text-sm font-medium text-foreground">Filtros</span>
         </div>
 
-        <Select value={filterSubject} onValueChange={(v) => onFilterSubjectChange(v ?? "all")}>
+        <Select<"all" | string>
+          value={filterSubject}
+          onValueChange={(v) => onFilterSubjectChange(v ?? "all")}
+        >
           <SelectTrigger className="h-8 w-44 text-sm">
             <SelectValue>
               {filterSubject === "all"
@@ -51,6 +55,7 @@ const TaskFilters: FC<TaskFiltersProps> = ({
                 : (subjects.find((d) => d.id === filterSubject)?.name ?? "Disciplina")}
             </SelectValue>
           </SelectTrigger>
+
           <SelectContent alignItemWithTrigger={false}>
             <SelectItem value="all">Todas as disciplinas</SelectItem>
             {subjects.map((d) => (
@@ -61,28 +66,27 @@ const TaskFilters: FC<TaskFiltersProps> = ({
           </SelectContent>
         </Select>
 
-        <Select value={filterStatus} onValueChange={(v) => onFilterStatusChange(v ?? "all")}>
+        <Select<"all" | StatusEnum>
+          value={filterStatus}
+          onValueChange={(v) => onFilterStatusChange(v ?? "all")}
+        >
           <SelectTrigger className="h-8 w-44 text-sm">
-            <SelectValue>
-              {filterStatus === "all"
-                ? "Todos os status"
-                : filterStatus === StatusEnum.PENDING
-                  ? "Pendente"
-                  : filterStatus === StatusEnum.IN_PROGRESS
-                    ? "Em andamento"
-                    : "Concluída"}
-            </SelectValue>
+            <SelectValue>{statusLabel(filterStatus)}</SelectValue>
           </SelectTrigger>
+
           <SelectContent alignItemWithTrigger={false}>
             <SelectItem value="all">Todos os status</SelectItem>
-            <SelectItem value={StatusEnum.PENDING}>Pendente</SelectItem>
-            <SelectItem value={StatusEnum.IN_PROGRESS}>Em andamento</SelectItem>
-            <SelectItem value={StatusEnum.COMPLETED}>Concluída</SelectItem>
+            {STATUS_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={onClear} className="h-8 text-xs">
+            <IconFilterOff className="mr-2 h-4 w-4" />
             Limpar filtros
           </Button>
         )}

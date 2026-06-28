@@ -110,7 +110,7 @@ export const mockTasks: Task[] = [
     title: "Relatório de Usabilidade",
     subjectId: "d2",
     deadline: "2026-07-05",
-    status: StatusEnum.PENDING,
+    status: StatusEnum.COMPLETED,
     score: 8.7,
     weight: 1,
   },
