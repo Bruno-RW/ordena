@@ -2,6 +2,7 @@
 
 import { FC } from "react";
 
+import { STATUS_OPTIONS, statusLabel } from "@/app/(app)/tasks/_lib/constants";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -79,6 +80,7 @@ const TaskDialog: FC<TaskDialogProps> = ({
                       : "Selecionar..."}
                   </SelectValue>
                 </SelectTrigger>
+
                 <SelectContent alignItemWithTrigger={false}>
                   {subjects.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
@@ -109,21 +111,15 @@ const TaskDialog: FC<TaskDialogProps> = ({
               }
             >
               <SelectTrigger className="w-full">
-                <SelectValue>
-                  {form.status === StatusEnum.PENDING
-                    ? "Pendente"
-                    : form.status === StatusEnum.IN_PROGRESS
-                      ? "Em andamento"
-                      : form.status === StatusEnum.COMPLETED
-                        ? "Concluída"
-                        : "Selecionar..."}
-                </SelectValue>
+                <SelectValue>{statusLabel(form.status) ?? "Selecionar..."}</SelectValue>
               </SelectTrigger>
 
               <SelectContent alignItemWithTrigger={false}>
-                <SelectItem value={StatusEnum.PENDING}>Pendente</SelectItem>
-                <SelectItem value={StatusEnum.IN_PROGRESS}>Em andamento</SelectItem>
-                <SelectItem value={StatusEnum.COMPLETED}>Concluída</SelectItem>
+                {STATUS_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>

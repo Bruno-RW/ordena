@@ -1,10 +1,10 @@
 "use client";
 
-import { IconFilter } from "@tabler/icons-react";
+import { IconFilter, IconFilterOff } from "@tabler/icons-react";
 
 import { FC } from "react";
 
-import { statusLabel } from "@/app/(app)/tasks/_lib/constants";
+import { STATUS_OPTIONS, statusLabel } from "@/app/(app)/tasks/_lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -76,14 +76,17 @@ const TaskFilters: FC<TaskFiltersProps> = ({
 
           <SelectContent alignItemWithTrigger={false}>
             <SelectItem value="all">Todos os status</SelectItem>
-            <SelectItem value={StatusEnum.PENDING}>Pendente</SelectItem>
-            <SelectItem value={StatusEnum.IN_PROGRESS}>Em andamento</SelectItem>
-            <SelectItem value={StatusEnum.COMPLETED}>Concluída</SelectItem>
+            {STATUS_OPTIONS.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
 
         {hasActiveFilters && (
           <Button variant="ghost" size="sm" onClick={onClear} className="h-8 text-xs">
+            <IconFilterOff className="mr-2 h-4 w-4" />
             Limpar filtros
           </Button>
         )}
