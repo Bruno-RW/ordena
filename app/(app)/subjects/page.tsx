@@ -6,9 +6,9 @@ import { useState } from "react";
 
 import { toast } from "sonner";
 
-import { SubjectCard } from "@/app/(app)/subjects/_components/SubjectCard";
-import { SubjectDeleteDialog } from "@/app/(app)/subjects/_components/SubjectDeleteDialog";
-import { SubjectDialog, SubjectFormData } from "@/app/(app)/subjects/_components/SubjectDialog";
+import SubjectCard from "@/app/(app)/subjects/_components/SubjectCard";
+import SubjectDeleteDialog from "@/app/(app)/subjects/_components/SubjectDeleteDialog";
+import SubjectDialog, { SubjectFormData } from "@/app/(app)/subjects/_components/SubjectDialog";
 import { COLOR_OPTIONS } from "@/app/(app)/subjects/_lib/constants";
 import Header from "@/components/Header";
 import { Button } from "@/components/ui/button";

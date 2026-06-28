@@ -2,6 +2,8 @@
 
 import { IconFilter } from "@tabler/icons-react";
 
+import { FC } from "react";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -23,14 +25,14 @@ interface TaskFiltersProps {
   onClear: () => void;
 }
 
-export function TaskFilters({
+const TaskFilters: FC<TaskFiltersProps> = ({
   subjects,
   filterSubject,
   filterStatus,
   onFilterSubjectChange,
   onFilterStatusChange,
   onClear,
-}: TaskFiltersProps) {
+}) => {
   const hasActiveFilters = filterSubject !== "all" || filterStatus !== "all";
 
   return (
@@ -87,4 +89,6 @@ export function TaskFilters({
       </CardContent>
     </Card>
   );
-}
+};
+
+export default TaskFilters;

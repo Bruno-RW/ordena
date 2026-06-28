@@ -1,5 +1,7 @@
 "use client";
 
+import { FC } from "react";
+
 import { COLOR_OPTIONS } from "@/app/(app)/subjects/_lib/constants";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,14 +27,14 @@ interface SubjectDialogProps {
   onSave: () => void;
 }
 
-export function SubjectDialog({
+const SubjectDialog: FC<SubjectDialogProps> = ({
   open,
   onOpenChange,
   editing,
   form,
   onFormChange,
   onSave,
-}: SubjectDialogProps) {
+}) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -113,4 +115,6 @@ export function SubjectDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default SubjectDialog;

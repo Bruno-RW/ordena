@@ -1,5 +1,7 @@
 "use client";
 
+import { FC } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,11 +19,11 @@ interface SubjectDeleteDialogProps {
   onConfirm: () => void;
 }
 
-export function SubjectDeleteDialog({
+const SubjectDeleteDialog: FC<SubjectDeleteDialogProps> = ({
   deleteId,
   onOpenChange,
   onConfirm,
-}: SubjectDeleteDialogProps) {
+}) => {
   return (
     <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && onOpenChange(false)}>
       <AlertDialogContent>
@@ -44,4 +46,6 @@ export function SubjectDeleteDialog({
       </AlertDialogContent>
     </AlertDialog>
   );
-}
+};
+
+export default SubjectDeleteDialog;

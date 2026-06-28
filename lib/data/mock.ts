@@ -1,6 +1,5 @@
 import { Subject } from "@/types/subject";
 import { Profile } from "@/types/profile";
-import { Score } from "@/types/score";
 import { StatusEnum, Task } from "@/types/task";
 
 export const mockSubjects: Subject[] = [
@@ -54,6 +53,8 @@ export const mockTasks: Task[] = [
     deadline: "2026-06-20",
     status: StatusEnum.PENDING,
     description: "Exercícios 1 a 15 da lista de derivadas.",
+    score: 8.5,
+    weight: 1,
   },
   {
     id: "t2",
@@ -62,6 +63,8 @@ export const mockTasks: Task[] = [
     deadline: "2026-06-25",
     status: StatusEnum.IN_PROGRESS,
     description: "Entregar protótipo no Figma com todas as telas.",
+    score: 9.0,
+    weight: 1,
   },
   {
     id: "t3",
@@ -70,6 +73,8 @@ export const mockTasks: Task[] = [
     deadline: "2026-06-22",
     status: StatusEnum.PENDING,
     description: "Implementar inserção, remoção e rotações.",
+    score: 7.0,
+    weight: 1,
   },
   {
     id: "t4",
@@ -78,6 +83,8 @@ export const mockTasks: Task[] = [
     deadline: "2026-06-18",
     status: StatusEnum.COMPLETED,
     description: "Diagrama completo com relacionamentos.",
+    score: 9.5,
+    weight: 1,
   },
   {
     id: "t5",
@@ -86,6 +93,8 @@ export const mockTasks: Task[] = [
     deadline: "2026-06-30",
     status: StatusEnum.IN_PROGRESS,
     description: "SRS com casos de uso e diagrama de classes.",
+    score: 8.0,
+    weight: 1,
   },
   {
     id: "t6",
@@ -93,6 +102,8 @@ export const mockTasks: Task[] = [
     subjectId: "d1",
     deadline: "2026-06-28",
     status: StatusEnum.PENDING,
+    score: 7.8,
+    weight: 1,
   },
   {
     id: "t7",
@@ -100,6 +111,8 @@ export const mockTasks: Task[] = [
     subjectId: "d2",
     deadline: "2026-07-05",
     status: StatusEnum.PENDING,
+    score: 8.7,
+    weight: 1,
   },
   {
     id: "t8",
@@ -107,20 +120,9 @@ export const mockTasks: Task[] = [
     subjectId: "d3",
     deadline: "2026-07-10",
     status: StatusEnum.PENDING,
+    score: 7.3,
+    weight: 1,
   },
-];
-
-export const mockScores: Score[] = [
-  { id: "n1", subjectId: "d1", description: "P1", value: 7.5, weight: 1 },
-  { id: "n2", subjectId: "d1", description: "P2", value: 8.0, weight: 1 },
-  { id: "n3", subjectId: "d2", description: "Projeto", value: 9.2, weight: 2 },
-  { id: "n4", subjectId: "d2", description: "Prova", value: 8.5, weight: 1 },
-  { id: "n5", subjectId: "d3", description: "P1", value: 6.5, weight: 1 },
-  { id: "n6", subjectId: "d3", description: "P2", value: 7.0, weight: 1 },
-  { id: "n7", subjectId: "d4", description: "Trabalho", value: 9.5, weight: 2 },
-  { id: "n8", subjectId: "d4", description: "Prova", value: 8.8, weight: 1 },
-  { id: "n9", subjectId: "d5", description: "Requisitos", value: 8.0, weight: 1 },
-  { id: "n10", subjectId: "d5", description: "Projeto Final", value: 8.7, weight: 2 },
 ];
 
 export const mockProfile: Profile = {

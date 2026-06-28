@@ -1,9 +1,8 @@
 "use client";
 
-import { IconEdit, IconPlus, IconTrash } from "@tabler/icons-react";
+import { FC } from "react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
@@ -29,9 +28,6 @@ interface ScoreListProps {
   selectedSubject: string;
   subjects: Subject[];
   onSelectSubject: (value: string) => void;
-  onAdd: () => void;
-  onEdit: (score: Score) => void;
-  onDelete: (id: string) => void;
 }
 
 function mediaColor(m: number | null): string {
@@ -41,16 +37,13 @@ function mediaColor(m: number | null): string {
   return "text-destructive";
 }
 
-export function ScoreList({
+const ScoreList: FC<ScoreListProps> = ({
   filteredScores,
   subjectGroups,
   selectedSubject,
   subjects,
   onSelectSubject,
-  onAdd,
-  onEdit,
-  onDelete,
-}: ScoreListProps) {
+}) => {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-4 flex-wrap">
@@ -61,10 +54,17 @@ export function ScoreList({
             {filteredScores.length !== 1 ? "s" : ""}
           </CardDescription>
         </div>
+
         <Select value={selectedSubject} onValueChange={(v) => onSelectSubject(v ?? "all")}>
           <SelectTrigger className="h-8 w-48 text-sm">
-            <SelectValue />
+            <SelectValue>
+              {selectedSubject === "all"
+                ? "Todas as disciplinas"
+                : (subjects.find((subject) => subject.id === selectedSubject)?.name ??
+                  selectedSubject)}
+            </SelectValue>
           </SelectTrigger>
+
           <SelectContent>
             <SelectItem value="all">Todas as disciplinas</SelectItem>
             {subjects.map((d) => (
@@ -80,10 +80,6 @@ export function ScoreList({
         {filteredScores.length === 0 ? (
           <div className="flex flex-col items-center py-10 gap-2 text-muted-foreground text-sm">
             <p>Nenhuma nota registrada.</p>
-            <Button variant="outline" size="sm" onClick={onAdd}>
-              <IconPlus data-icon="inline-start" />
-              Registrar nota
-            </Button>
           </div>
         ) : (
           <div className="flex flex-col gap-2">
@@ -131,24 +127,6 @@ export function ScoreList({
                       >
                         {score.value.toFixed(1)}
                       </span>
-                      <div className="flex gap-1">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7"
-                          onClick={() => onEdit(score)}
-                        >
-                          <IconEdit className="size-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="size-7 text-destructive hover:text-destructive"
-                          onClick={() => onDelete(score.id)}
-                        >
-                          <IconTrash className="size-3.5" />
-                        </Button>
-                      </div>
                     </div>
                   ))}
                 </div>
@@ -159,4 +137,6 @@ export function ScoreList({
       </CardContent>
     </Card>
   );
-}
+};
+
+export default ScoreList;

@@ -1,5 +1,7 @@
 "use client";
 
+import { FC } from "react";
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -17,7 +19,7 @@ interface TaskDeleteDialogProps {
   onConfirm: () => void;
 }
 
-export function TaskDeleteDialog({ deleteId, onOpenChange, onConfirm }: TaskDeleteDialogProps) {
+const TaskDeleteDialog: FC<TaskDeleteDialogProps> = ({ deleteId, onOpenChange, onConfirm }) => {
   return (
     <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && onOpenChange(false)}>
       <AlertDialogContent>
@@ -37,4 +39,6 @@ export function TaskDeleteDialog({ deleteId, onOpenChange, onConfirm }: TaskDele
       </AlertDialogContent>
     </AlertDialog>
   );
-}
+};
+
+export default TaskDeleteDialog;

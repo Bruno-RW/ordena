@@ -1,5 +1,7 @@
 "use client";
 
+import { FC } from "react";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,7 +36,7 @@ interface TaskDialogProps {
   onSave: () => void;
 }
 
-export function TaskDialog({
+const TaskDialog: FC<TaskDialogProps> = ({
   open,
   onOpenChange,
   editing,
@@ -42,7 +44,7 @@ export function TaskDialog({
   subjects,
   onFormChange,
   onSave,
-}: TaskDialogProps) {
+}) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -77,7 +79,7 @@ export function TaskDialog({
                       : "Selecionar..."}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent alignItemWithTrigger={false}>
                   {subjects.map((d) => (
                     <SelectItem key={d.id} value={d.id}>
                       {d.name}
@@ -117,7 +119,8 @@ export function TaskDialog({
                         : "Selecionar..."}
                 </SelectValue>
               </SelectTrigger>
-              <SelectContent>
+
+              <SelectContent alignItemWithTrigger={false}>
                 <SelectItem value={StatusEnum.PENDING}>Pendente</SelectItem>
                 <SelectItem value={StatusEnum.IN_PROGRESS}>Em andamento</SelectItem>
                 <SelectItem value={StatusEnum.COMPLETED}>Concluída</SelectItem>
@@ -144,14 +147,33 @@ export function TaskDialog({
               step="0.1"
               min="0"
               max="10"
-              value={form.note ?? ""}
+              value={form.score ?? ""}
               onChange={(e) =>
                 onFormChange({
                   ...form,
-                  note: e.target.value ? Number(e.target.value) : undefined,
+                  score: e.target.value ? Number(e.target.value) : undefined,
                 })
               }
               placeholder="Ex: 8.5"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5">
+            <Label htmlFor="task-weight">Peso</Label>
+            <Input
+              id="task-weight"
+              type="number"
+              min={1}
+              max={5}
+              step={1}
+              value={form.weight ?? 1}
+              onChange={(e) =>
+                onFormChange({
+                  ...form,
+                  weight: e.target.value ? Number(e.target.value) : undefined,
+                })
+              }
+              placeholder="Ex: 1"
             />
           </div>
         </div>
@@ -165,4 +187,6 @@ export function TaskDialog({
       </DialogContent>
     </Dialog>
   );
-}
+};
+
+export default TaskDialog;

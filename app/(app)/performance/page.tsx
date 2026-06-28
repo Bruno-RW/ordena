@@ -1,50 +1,34 @@
 "use client";
 
-import { IconPlus, IconTrophy } from "@tabler/icons-react";
+import { IconTrophy } from "@tabler/icons-react";
 
 import { useMemo, useState } from "react";
 
-import { toast } from "sonner";
-
-import { PerformanceChart } from "@/app/(app)/performance/_components/PerformanceChart";
-import { ScoreDeleteDialog } from "@/app/(app)/performance/_components/ScoreDeleteDialog";
-import { ScoreDialog, ScoreFormData } from "@/app/(app)/performance/_components/ScoreDialog";
-import { ScoreList } from "@/app/(app)/performance/_components/ScoreList";
+import PerformanceChart from "@/app/(app)/performance/_components/PerformanceChart";
+import ScoreList from "@/app/(app)/performance/_components/ScoreList";
 import { mediaColor, subjectAverage } from "@/app/(app)/performance/_lib/utils";
 import Header from "@/components/Header";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { useData } from "@/hooks/useData";
 import { cn } from "@/lib/utils";
-import { Score } from "@/types/score";
-
-const emptyForm: ScoreFormData = {
-  subjectId: "",
-  description: "",
-  value: 0,
-  weight: 1,
-};
 
 const PerformancePage = () => {
-  const { scores, subjects, addScore, updateScore, deleteScore } = useData();
+  const { scores, subjects } = useData();
 
   const [selectedSubject, setSelectedSubject] = useState("all");
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [editing, setEditing] = useState<Score | null>(null);
-  const [form, setForm] = useState<ScoreFormData>(emptyForm);
 
   const globalAverage = useMemo(() => subjectAverage(scores), [scores]);
 
   const subjectData = useMemo(() => {
     return subjects.map((d) => {
-      const dns = scores.filter((n) => n.subjectId === d.id);
+      const subjectScores = scores.filter((score) => score.subjectId === d.id);
+
       return {
         id: d.id,
         name: d.name,
         color: d.color,
-        average: subjectAverage(dns),
-        dns,
+        average: subjectAverage(subjectScores),
+        subjectScores,
       };
     });
   }, [subjects, scores]);
@@ -54,7 +38,7 @@ const PerformancePage = () => {
       subjectData
         .filter((d) => d.average !== null)
         .map((d) => ({
-          name: d.name.split(" ").slice(0, 2).join(" "),
+          name: d.name,
           average: parseFloat((d.average ?? 0).toFixed(1)),
           color: d.color,
         })),
@@ -66,60 +50,9 @@ const PerformancePage = () => {
     return scores.filter((n) => n.subjectId === selectedSubject);
   }, [scores, selectedSubject]);
 
-  function openAdd() {
-    setEditing(null);
-    setForm({
-      ...emptyForm,
-      subjectId: selectedSubject !== "all" ? selectedSubject : (subjects[0]?.id ?? ""),
-    });
-    setDialogOpen(true);
-  }
-
-  function openEdit(score: Score) {
-    setEditing(score);
-    setForm({
-      subjectId: score.subjectId,
-      description: score.description,
-      value: score.value,
-      weight: score.weight,
-    });
-    setDialogOpen(true);
-  }
-
-  function handleSave() {
-    if (!form.description.trim()) {
-      toast.error("A descrição é obrigatória.");
-      return;
-    }
-    if (form.value < 0 || form.value > 10) {
-      toast.error("A nota deve estar entre 0 e 10.");
-      return;
-    }
-    if (editing) {
-      updateScore({ ...editing, ...form });
-      toast.success("Nota atualizada.");
-    } else {
-      addScore(form);
-      toast.success("Nota adicionada.");
-    }
-    setDialogOpen(false);
-  }
-
-  function handleDelete() {
-    if (!deleteId) return;
-    deleteScore(deleteId);
-    toast.success("Nota removida.");
-    setDeleteId(null);
-  }
-
   return (
     <div className="flex flex-col flex-1">
-      <Header title="Desempenho" description="Notas e médias">
-        <Button size="sm" onClick={openAdd}>
-          <IconPlus data-icon="inline-start" />
-          Registrar nota
-        </Button>
-      </Header>
+      <Header title="Desempenho" description="Notas e médias" />
 
       <main className="flex-1 p-4 md:p-6 flex flex-col gap-6">
         {/* Overview stat cards */}
@@ -155,7 +88,7 @@ const PerformancePage = () => {
                   {d.average !== null ? d.average.toFixed(1) : "–"}
                 </p>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {d.dns.length} nota{d.dns.length !== 1 ? "s" : ""}
+                  {d.subjectScores.length} nota{d.subjectScores.length !== 1 ? "s" : ""}
                 </p>
               </CardContent>
             </Card>
@@ -170,27 +103,8 @@ const PerformancePage = () => {
           selectedSubject={selectedSubject}
           subjects={subjects}
           onSelectSubject={setSelectedSubject}
-          onAdd={openAdd}
-          onEdit={openEdit}
-          onDelete={setDeleteId}
         />
       </main>
-
-      <ScoreDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        editing={editing}
-        form={form}
-        subjects={subjects}
-        onFormChange={setForm}
-        onSave={handleSave}
-      />
-
-      <ScoreDeleteDialog
-        deleteId={deleteId}
-        onOpenChange={(open) => !open && setDeleteId(null)}
-        onConfirm={handleDelete}
-      />
     </div>
   );
 };

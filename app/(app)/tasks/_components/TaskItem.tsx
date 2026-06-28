@@ -2,6 +2,8 @@
 
 import { IconCheck, IconEdit, IconTrash } from "@tabler/icons-react";
 
+import { FC } from "react";
+
 import { STATUS_LABELS, STATUS_VARIANTS } from "@/app/(app)/tasks/_lib/constants";
 import { formatDateLabel } from "@/app/(app)/tasks/_lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -19,7 +21,7 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
 }
 
-export function TaskItem({ task, subject, today, onToggle, onEdit, onDelete }: TaskItemProps) {
+const TaskItem: FC<TaskItemProps> = ({ task, subject, today, onToggle, onEdit, onDelete }) => {
   const days = today
     ? (() => {
         const t = new Date(today);
@@ -64,9 +66,9 @@ export function TaskItem({ task, subject, today, onToggle, onEdit, onDelete }: T
         >
           {task.title}
         </span>
-        {task.note !== undefined && (
-          <span className="text-xs text-muted-foreground">
-            Nota: {task.note % 1 === 0 ? task.note : task.note.toFixed(1)}
+        {task.score !== undefined && (
+          <span className="text-xs font-semibold text-foreground shrink-0">
+            Nota: {task.score % 1 === 0 ? task.score : task.score.toFixed(1)}
           </span>
         )}
         {subject && (
@@ -104,4 +106,6 @@ export function TaskItem({ task, subject, today, onToggle, onEdit, onDelete }: T
       </div>
     </div>
   );
-}
+};
+
+export default TaskItem;

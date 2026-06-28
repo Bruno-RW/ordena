@@ -11,5 +11,6 @@ export type Task = {
   deadline: string;
   status: StatusEnum;
   description?: string;
-  note?: number;
+  score?: number;
+  weight?: number;
 };

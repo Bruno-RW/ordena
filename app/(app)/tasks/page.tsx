@@ -6,10 +6,10 @@ import { useEffect, useMemo, useState } from "react";
 
 import { toast } from "sonner";
 
-import { TaskDeleteDialog } from "@/app/(app)/tasks/_components/TaskDeleteDialog";
-import { TaskDialog, TaskFormData } from "@/app/(app)/tasks/_components/TaskDialog";
-import { TaskFilters } from "@/app/(app)/tasks/_components/TaskFilters";
-import { TaskItem } from "@/app/(app)/tasks/_components/TaskItem";
+import TaskDeleteDialog from "@/app/(app)/tasks/_components/TaskDeleteDialog";
+import TaskDialog, { TaskFormData } from "@/app/(app)/tasks/_components/TaskDialog";
+import TaskFilters from "@/app/(app)/tasks/_components/TaskFilters";
+import TaskItem from "@/app/(app)/tasks/_components/TaskItem";
 import Header from "@/components/Header";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,8 @@ const emptyForm: TaskFormData = {
   deadline: "",
   status: StatusEnum.PENDING,
   description: "",
-  note: undefined,
+  score: undefined,
+  weight: 1,
 };
 
 const TasksPage = () => {
@@ -81,7 +82,8 @@ const TasksPage = () => {
       deadline: task.deadline,
       status: task.status,
       description: task.description ?? "",
-      note: task.note,
+      score: task.score,
+      weight: task.weight ?? 1,
     });
     setDialogOpen(true);
   }

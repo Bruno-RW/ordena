@@ -21,15 +21,11 @@ export type DataContextProps = {
   deleteTask: (id: string) => void;
   toggleTask: (id: string) => void;
 
-  //? === === === Scores === === === ?//
-  scores: Score[];
-  addScore: (score: Omit<Score, "id">) => void;
-  updateScore: (score: Score) => void;
-  deleteScore: (id: string) => void;
-
   //? === === === Profile === === === ?//
   profile: Profile;
   updateProfile: (profile: Profile) => void;
+
+  scores: Score[];
 };
 
 const DataContext = createContext<DataContextProps | null>(null);

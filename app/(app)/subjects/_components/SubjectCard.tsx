@@ -2,6 +2,8 @@
 
 import { IconClock, IconDoor, IconEdit, IconTrash, IconUser } from "@tabler/icons-react";
 
+import { FC } from "react";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,7 +26,7 @@ function subjectAverage(scores: Score[]): number | null {
   return totalWeight > 0 ? sum / totalWeight : null;
 }
 
-export function SubjectCard({ subject, tasks, scores, onEdit, onDelete }: SubjectCardProps) {
+const SubjectCard: FC<SubjectCardProps> = ({ subject, tasks, scores, onEdit, onDelete }) => {
   const subjectTasks = tasks.filter((t) => t.subjectId === subject.id);
   const subjectScores = scores.filter((n) => n.subjectId === subject.id);
   const average = subjectAverage(subjectScores);
@@ -84,4 +86,6 @@ export function SubjectCard({ subject, tasks, scores, onEdit, onDelete }: Subjec
       </CardContent>
     </Card>
   );
-}
+};
+
+export default SubjectCard;
