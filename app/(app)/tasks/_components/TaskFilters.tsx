@@ -51,7 +51,7 @@ const TaskFilters: FC<TaskFiltersProps> = ({
                 : (subjects.find((d) => d.id === filterSubject)?.name ?? "Disciplina")}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent alignItemWithTrigger={false}>
             <SelectItem value="all">Todas as disciplinas</SelectItem>
             {subjects.map((d) => (
               <SelectItem key={d.id} value={d.id}>
@@ -73,7 +73,7 @@ const TaskFilters: FC<TaskFiltersProps> = ({
                     : "Concluída"}
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent alignItemWithTrigger={false}>
             <SelectItem value="all">Todos os status</SelectItem>
             <SelectItem value={StatusEnum.PENDING}>Pendente</SelectItem>
             <SelectItem value={StatusEnum.IN_PROGRESS}>Em andamento</SelectItem>

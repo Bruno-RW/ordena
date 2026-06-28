@@ -65,7 +65,7 @@ const ScoreList: FC<ScoreListProps> = ({
             </SelectValue>
           </SelectTrigger>
 
-          <SelectContent>
+          <SelectContent alignItemWithTrigger={false}>
             <SelectItem value="all">Todas as disciplinas</SelectItem>
             {subjects.map((d) => (
               <SelectItem key={d.id} value={d.id}>
