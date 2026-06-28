@@ -6,28 +6,13 @@ import { FC } from "react";
 
 import Link from "next/link";
 
+import { STATUS_LABELS, STATUS_VARIANTS } from "@/app/(app)/tasks/_lib/constants";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn, daysUntil, formatDateLabel } from "@/lib/utils";
 import { Subject } from "@/types/subject";
-import { StatusEnum, Task } from "@/types/task";
-
-function statusLabel(status: StatusEnum): string {
-  if (status === StatusEnum.COMPLETED) return "Concluída";
-  if (status === StatusEnum.IN_PROGRESS) return "Em andamento";
-  return "Pendente";
-}
-
-function statusVariant(status: StatusEnum): "default" | "secondary" | "outline" | "destructive" {
-  if (status === StatusEnum.COMPLETED) return "default";
-  if (status === StatusEnum.IN_PROGRESS) return "secondary";
-  return "outline";
-}
-
-function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("pt-BR", { day: "2-digit", month: "short" });
-}
+import { Task } from "@/types/task";
 
 interface UpcomingTasksProps {
   tasks: Task[];
@@ -43,6 +28,7 @@ const UpcomingTasks: FC<UpcomingTasksProps> = ({ tasks, subjectMap, today }) => 
           <CardTitle className="text-sm font-semibold">Próximas entregas</CardTitle>
           <CardDescription>Tarefas mais urgentes</CardDescription>
         </div>
+
         <Link href="/tasks">
           <Button>
             <IconEye />
@@ -60,15 +46,7 @@ const UpcomingTasks: FC<UpcomingTasksProps> = ({ tasks, subjectMap, today }) => 
         ) : (
           tasks.map((task) => {
             const subject = subjectMap[task.subjectId] as Subject | undefined;
-            const days = today
-              ? (() => {
-                  const t = new Date(today);
-                  t.setHours(0, 0, 0, 0);
-                  const d = new Date(task.deadline);
-                  d.setHours(0, 0, 0, 0);
-                  return Math.round((d.getTime() - t.getTime()) / 86400000);
-                })()
-              : null;
+            const days = today ? daysUntil(task.deadline, today) : null;
             const isUrgent = days !== null && days <= 2;
 
             return (
@@ -78,6 +56,7 @@ const UpcomingTasks: FC<UpcomingTasksProps> = ({ tasks, subjectMap, today }) => 
               >
                 <div className="flex flex-col gap-1 min-w-0">
                   <p className="text-sm font-medium text-foreground truncate">{task.title}</p>
+
                   <div className="flex items-center gap-2 flex-wrap">
                     {subject && (
                       <span
@@ -87,9 +66,13 @@ const UpcomingTasks: FC<UpcomingTasksProps> = ({ tasks, subjectMap, today }) => 
                         {subject.name}
                       </span>
                     )}
-                    <Badge variant={statusVariant(task.status)}>{statusLabel(task.status)}</Badge>
+
+                    <Badge variant={STATUS_VARIANTS[task.status]}>
+                      {STATUS_LABELS[task.status]}
+                    </Badge>
                   </div>
                 </div>
+
                 <div
                   className={cn(
                     "flex items-center gap-1 text-xs shrink-0 font-medium",
@@ -101,17 +84,8 @@ const UpcomingTasks: FC<UpcomingTasksProps> = ({ tasks, subjectMap, today }) => 
                   ) : (
                     <IconClock className="size-3.5" />
                   )}
-                  <span>
-                    {days === null
-                      ? formatDate(task.deadline)
-                      : days === 0
-                        ? "Hoje"
-                        : days === 1
-                          ? "Amanhã"
-                          : days < 0
-                            ? "Atrasada"
-                            : formatDate(task.deadline)}
-                  </span>
+
+                  <span>{formatDateLabel(task.deadline, today)}</span>
                 </div>
               </div>
             );

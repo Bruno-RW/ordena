@@ -5,10 +5,9 @@ import { IconCheck, IconEdit, IconTrash } from "@tabler/icons-react";
 import { FC } from "react";
 
 import { STATUS_LABELS, STATUS_VARIANTS } from "@/app/(app)/tasks/_lib/constants";
-import { formatDateLabel } from "@/app/(app)/tasks/_lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn, daysUntil, formatDateLabel } from "@/lib/utils";
 import { Subject } from "@/types/subject";
 import { StatusEnum, Task } from "@/types/task";
 
@@ -22,16 +21,7 @@ interface TaskItemProps {
 }
 
 const TaskItem: FC<TaskItemProps> = ({ task, subject, today, onToggle, onEdit, onDelete }) => {
-  const days = today
-    ? (() => {
-        const t = new Date(today);
-        t.setHours(0, 0, 0, 0);
-        const d = new Date(task.deadline);
-        d.setHours(0, 0, 0, 0);
-        return Math.round((d.getTime() - t.getTime()) / 86400000);
-      })()
-    : null;
-
+  const days = today ? daysUntil(task.deadline, today) : null;
   const isOverdue = days !== null && days < 0 && task.status !== StatusEnum.COMPLETED;
 
   return (
