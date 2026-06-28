@@ -68,7 +68,12 @@ const TaskItem: FC<TaskItemProps> = ({ task, subject, today, onToggle, onEdit, o
         </span>
         {task.score !== undefined && (
           <span className="text-xs font-semibold text-foreground shrink-0">
-            Nota: {task.score % 1 === 0 ? task.score : task.score.toFixed(1)}
+            Nota: {task.score.toFixed(1)}/10
+            {task.weight && task.weight > 1 ? (
+              <span className="ml-1 text-muted-foreground">
+                ({((task.score * task.weight) / 10).toFixed(2)})
+              </span>
+            ) : null}
           </span>
         )}
         {subject && (

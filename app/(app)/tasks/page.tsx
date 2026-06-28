@@ -32,8 +32,8 @@ const TasksPage = () => {
   const [today, setToday] = useState<Date | null>(null);
   useEffect(() => setToday(new Date()), []);
 
-  const [filterSubject, setFilterSubject] = useState("all");
-  const [filterStatus, setFilterStatus] = useState("all");
+  const [filterSubject, setFilterSubject] = useState<"all" | string>("all");
+  const [filterStatus, setFilterStatus] = useState<"all" | StatusEnum>("all");
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [editing, setEditing] = useState<Task | null>(null);
