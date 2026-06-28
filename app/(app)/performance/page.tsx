@@ -64,6 +64,7 @@ const PerformancePage = () => {
                 Média geral
               </CardDescription>
             </CardHeader>
+
             <CardContent>
               <p className={cn("text-4xl font-bold", mediaColor(globalAverage))}>
                 {globalAverage !== null ? globalAverage.toFixed(1) : "–"}

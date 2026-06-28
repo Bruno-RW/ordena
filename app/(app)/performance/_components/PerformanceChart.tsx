@@ -7,6 +7,7 @@ import {
   BarChart,
   CartesianGrid,
   Cell,
+  LabelList,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -36,7 +37,7 @@ const PerformanceChart: FC<PerformanceChartProps> = ({ data }) => {
       </CardHeader>
 
       <CardContent>
-        <ResponsiveContainer width="100%" height={220}>
+        <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data} margin={{ top: 16, right: 8, left: 0, bottom: 32 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
 
@@ -76,6 +77,13 @@ const PerformanceChart: FC<PerformanceChartProps> = ({ data }) => {
               {data.map((entry, index) => (
                 <Cell key={index} fill={entry.color} />
               ))}
+
+              <LabelList
+                dataKey="average"
+                position="top"
+                formatter={(v) => (typeof v === "number" ? v.toFixed(1) : String(v))}
+                style={{ fontSize: 12, fontWeight: 500 }}
+              />
             </Bar>
           </BarChart>
         </ResponsiveContainer>
